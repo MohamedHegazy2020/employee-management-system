@@ -1,298 +1,272 @@
 <template>
   <div class="space-y-6">
-    <!-- Header with Breadcrumb -->
-    <div class="flex items-center justify-between">
-      <div>
-        <nav class="flex items-center space-x-2 text-sm text-gray-500 mb-2">
-          <router-link
-            to="/companies"
-            class="hover:text-blue-600 transition-colors"
-          >
-            Companies
-          </router-link>
-          <i class="pi pi-chevron-right text-xs"></i>
-          <span class="text-gray-900 font-medium">{{
-            company?.name || "Loading..."
-          }}</span>
-        </nav>
-        <h1 class="text-3xl font-bold text-gray-900">Company Details</h1>
-        <p class="mt-1 text-sm text-gray-600">
-          View comprehensive information about {{ company?.name }}
-        </p>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="flex items-center space-x-3">
-        <BaseButton
-          label="Back to List"
-          icon="pi pi-arrow-left"
-          variant="secondary"
-          size="medium"
-          padding="normal"
-          @click="$router.push('/companies')"
-        />
-        <BaseButton
-          label="Edit Company"
-          icon="pi pi-pencil"
-          variant="primary"
-          size="medium"
-          padding="normal"
-          @click="$router.push(`/companies/${companyId}/edit`)"
-        />
-      </div>
-    </div>
-
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center py-12">
       <div class="text-center">
-        <div
-          class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"
-        ></div>
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
         <p class="mt-4 text-gray-600">Loading company details...</p>
       </div>
     </div>
 
     <!-- Error State -->
-    <div
-      v-else-if="error"
-      class="bg-red-50 border border-red-200 rounded-xl p-6"
-    >
-      <div class="flex items-center">
-        <i class="pi pi-exclamation-triangle text-red-500 text-xl mr-3"></i>
-        <div>
-          <h3 class="text-red-800 font-semibold">Error Loading Company</h3>
-          <p class="text-red-600 mt-1">{{ error }}</p>
-        </div>
+    <div v-else-if="error" class="text-center py-12">
+      <div class="text-red-600 mb-4">
+        <i class="pi pi-exclamation-triangle text-4xl"></i>
       </div>
+      <h3 class="text-lg font-semibold text-gray-900 mb-2">Error Loading Company</h3>
+      <p class="text-gray-600 mb-4">{{ error }}</p>
+      <BaseButton
+        label="Try Again"
+        icon="pi pi-refresh"
+        variant="primary"
+        @click="loadCompany"
+      />
     </div>
 
     <!-- Company Details -->
-    <div v-else-if="company" class="space-y-6">
-      <!-- Company Header Card -->
-      <Card class="company-header-card">
-        <template #content>
-          <div class="flex items-start space-x-6">
-            <!-- Company Avatar -->
-            <div class="flex-shrink-0">
-              <div
-                class="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg"
-              >
-                <i class="pi pi-building text-white text-3xl"></i>
-              </div>
-            </div>
+    <div v-else-if="company">
+      <!-- Header -->
+      <div class="flex items-center justify-between">
+        <div>
+          <nav class="flex items-center space-x-2 text-sm text-gray-500 mb-2">
+            <router-link
+              to="/companies"
+              class="hover:text-blue-600 transition-colors"
+            >
+              Companies
+            </router-link>
+            <i class="pi pi-chevron-right text-xs"></i>
+            <span class="text-gray-900 font-medium">{{ company.name }}</span>
+          </nav>
+          <h1 class="text-3xl font-bold text-gray-900">{{ company.name }}</h1>
+          <p class="mt-1 text-sm text-gray-600">
+            Company Code: {{ company.code }} | Industry: {{ company.industry }}
+          </p>
+        </div>
 
-            <!-- Company Info -->
-            <div class="flex-1">
-              <div class="flex items-center space-x-3 mb-2">
-                <h2 class="text-2xl font-bold text-gray-900">
-                  {{ company.name }}
-                </h2>
-                <span
-                  class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full"
-                >
-                  {{ company.code }}
-                </span>
-              </div>
-
-              <div
-                class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600"
-              >
-                <div class="flex items-center">
-                  <i class="pi pi-envelope text-gray-400 mr-2"></i>
-                  <a
-                    :href="`mailto:${company.email}`"
-                    class="hover:text-blue-600 transition-colors"
-                  >
-                    {{ company.email }}
-                  </a>
-                </div>
-                <div class="flex items-center">
-                  <i class="pi pi-phone text-gray-400 mr-2"></i>
-                  <a
-                    :href="`tel:${company.phone}`"
-                    class="hover:text-blue-600 transition-colors"
-                  >
-                    {{ company.phone }}
-                  </a>
-                </div>
-                <div v-if="company.website" class="flex items-center">
-                  <i class="pi pi-globe text-gray-400 mr-2"></i>
-                  <a
-                    :href="company.website"
-                    target="_blank"
-                    class="hover:text-blue-600 transition-colors"
-                  >
-                    {{ company.website }}
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            <!-- Status Badge -->
-            <div class="flex-shrink-0">
-              <span
-                class="bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full"
-              >
-                Active
-              </span>
-            </div>
-          </div>
-        </template>
-      </Card>
-
-      <!-- Stats Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card class="stat-card">
-          <template #content>
-            <div class="text-center">
-              <div
-                class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3"
-              >
-                <i class="pi pi-users text-blue-600 text-xl"></i>
-              </div>
-              <h3 class="text-2xl font-bold text-gray-900">
-                {{ company.employeeCount }}
-              </h3>
-              <p class="text-gray-600 text-sm">Total Employees</p>
-            </div>
-          </template>
-        </Card>
-
-        <Card class="stat-card">
-          <template #content>
-            <div class="text-center">
-              <div
-                class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3"
-              >
-                <i class="pi pi-sitemap text-green-600 text-xl"></i>
-              </div>
-              <h3 class="text-2xl font-bold text-gray-900">
-                {{ company.departmentCount }}
-              </h3>
-              <p class="text-gray-600 text-sm">Departments</p>
-            </div>
-          </template>
-        </Card>
-
-        <Card class="stat-card">
-          <template #content>
-            <div class="text-center">
-              <div
-                class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3"
-              >
-                <i class="pi pi-calendar text-purple-600 text-xl"></i>
-              </div>
-              <h3 class="text-lg font-bold text-gray-900">
-                {{ formatDate(company.createdAt) }}
-              </h3>
-              <p class="text-gray-600 text-sm">Founded</p>
-            </div>
-          </template>
-        </Card>
+        <!-- Action Buttons -->
+        <div class="flex items-center space-x-3">
+          <BaseButton
+            label="Back to List"
+            icon="pi pi-arrow-left"
+            variant="secondary"
+            size="medium"
+            padding="normal"
+            @click="$router.push('/companies')"
+          />
+          <BaseButton
+            label="Edit Company"
+            icon="pi pi-pencil"
+            variant="primary"
+            size="medium"
+            padding="normal"
+            @click="$router.push(`/companies/${company.id}/edit`)"
+          />
+        </div>
       </div>
 
-      <!-- Detailed Information -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Company Information -->
-        <Card>
-          <template #title>
-            <div class="flex items-center">
-              <i class="pi pi-info-circle text-blue-600 mr-2"></i>
-              <span>Company Information</span>
-            </div>
-          </template>
-          <template #content>
-            <div class="space-y-4">
-              <div
-                class="flex justify-between items-start py-3 border-b border-gray-100"
-              >
-                <span class="text-gray-600 font-medium">Company Name</span>
-                <span class="text-gray-900 font-semibold">{{
-                  company.name
-                }}</span>
+      <!-- Company Overview -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main Company Card -->
+        <div class="lg:col-span-2">
+          <Card>
+            <template #title>
+              <div class="flex items-center">
+                <i class="pi pi-building text-blue-600 mr-2"></i>
+                <span>Company Overview</span>
               </div>
-              <div
-                class="flex justify-between items-start py-3 border-b border-gray-100"
-              >
-                <span class="text-gray-600 font-medium">Company Code</span>
-                <span class="text-gray-900 font-semibold">{{
-                  company.code
-                }}</span>
-              </div>
-              <div
-                class="flex justify-between items-start py-3 border-b border-gray-100"
-              >
-                <span class="text-gray-600 font-medium">Email Address</span>
-                <span class="text-gray-900">{{ company.email }}</span>
-              </div>
-              <div
-                class="flex justify-between items-start py-3 border-b border-gray-100"
-              >
-                <span class="text-gray-600 font-medium">Phone Number</span>
-                <span class="text-gray-900">{{ company.phone }}</span>
-              </div>
-              <div
-                v-if="company.website"
-                class="flex justify-between items-start py-3 border-b border-gray-100"
-              >
-                <span class="text-gray-600 font-medium">Website</span>
-                <a
-                  :href="company.website"
-                  target="_blank"
-                  class="text-blue-600 hover:text-blue-800 transition-colors"
-                >
-                  {{ company.website }}
-                </a>
-              </div>
-              <div class="flex justify-between items-start py-3">
-                <span class="text-gray-600 font-medium">Last Updated</span>
-                <span class="text-gray-900">{{
-                  formatDate(company.updatedAt)
-                }}</span>
-              </div>
-            </div>
-          </template>
-        </Card>
+            </template>
+            <template #content>
+              <div class="space-y-6">
+                <!-- Basic Information -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label class="text-sm font-medium text-gray-700">Company Name</label>
+                    <p class="text-lg font-semibold text-gray-900">{{ company.name }}</p>
+                  </div>
+                  <div>
+                    <label class="text-sm font-medium text-gray-700">Company Code</label>
+                    <p class="text-lg font-semibold text-gray-900">{{ company.code }}</p>
+                  </div>
+                  <div>
+                    <label class="text-sm font-medium text-gray-700">Industry</label>
+                    <p class="text-lg text-gray-900">{{ company.industry }}</p>
+                  </div>
+                  <div>
+                    <label class="text-sm font-medium text-gray-700">Company Size</label>
+                    <p class="text-lg text-gray-900">{{ company.size }}</p>
+                  </div>
+                  <div>
+                    <label class="text-sm font-medium text-gray-700">Status</label>
+                    <Tag
+                      :value="company.status"
+                      :severity="getStatusSeverity(company.status)"
+                      class="text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label class="text-sm font-medium text-gray-700">Founded Year</label>
+                    <p class="text-lg text-gray-900">{{ company.foundedYear || 'Not specified' }}</p>
+                  </div>
+                </div>
 
-        <!-- Address Information -->
-        <Card>
-          <template #title>
-            <div class="flex items-center">
-              <i class="pi pi-map-marker text-green-600 mr-2"></i>
-              <span>Address Information</span>
-            </div>
-          </template>
-          <template #content>
-            <div class="space-y-4">
-              <div class="flex items-start space-x-3">
-                <i class="pi pi-map-marker text-gray-400 mt-1"></i>
+                <!-- Contact Information -->
+                <div class="border-t pt-6">
+                  <h4 class="text-lg font-semibold text-gray-900 mb-4">Contact Information</h4>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label class="text-sm font-medium text-gray-700">Email</label>
+                      <p class="text-lg text-gray-900">
+                        <a :href="`mailto:${company.email}`" class="text-blue-600 hover:text-blue-800">
+                          {{ company.email }}
+                        </a>
+                      </p>
+                    </div>
+                    <div>
+                      <label class="text-sm font-medium text-gray-700">Phone</label>
+                      <p class="text-lg text-gray-900">
+                        <a :href="`tel:${company.phone}`" class="text-blue-600 hover:text-blue-800">
+                          {{ company.phone }}
+                        </a>
+                      </p>
+                    </div>
+                    <div v-if="company.website">
+                      <label class="text-sm font-medium text-gray-700">Website</label>
+                      <p class="text-lg text-gray-900">
+                        <a :href="company.website" target="_blank" class="text-blue-600 hover:text-blue-800">
+                          {{ company.website }}
+                        </a>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Address -->
+                <div class="border-t pt-6">
+                  <h4 class="text-lg font-semibold text-gray-900 mb-4">Address</h4>
+                  <div class="bg-gray-50 p-4 rounded-lg">
+                    <p class="text-gray-900">
+                      {{ company.address?.street }}<br>
+                      {{ company.address?.city }}, {{ company.address?.state }} {{ company.address?.zipCode }}<br>
+                      {{ getCountryName(company.address?.country) }}
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Description -->
+                <div v-if="company.description" class="border-t pt-6">
+                  <h4 class="text-lg font-semibold text-gray-900 mb-4">Description</h4>
+                  <p class="text-gray-700 leading-relaxed">{{ company.description }}</p>
+                </div>
+              </div>
+            </template>
+          </Card>
+        </div>
+
+        <!-- Statistics Sidebar -->
+        <div class="space-y-6">
+          <!-- Quick Stats -->
+          <Card>
+            <template #title>
+              <div class="flex items-center">
+                <i class="pi pi-chart-bar text-green-600 mr-2"></i>
+                <span>Quick Stats</span>
+              </div>
+            </template>
+            <template #content>
+              <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-gray-600">Employees</span>
+                  <span class="text-lg font-semibold text-gray-900">{{ company.employeeCount || 0 }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-gray-600">Departments</span>
+                  <span class="text-lg font-semibold text-gray-900">{{ company.departmentCount || 0 }}</span>
+                </div>
+                <div v-if="company.annualRevenue" class="flex items-center justify-between">
+                  <span class="text-sm text-gray-600">Annual Revenue</span>
+                  <span class="text-lg font-semibold text-gray-900">${{ formatCurrency(company.annualRevenue) }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-gray-600">Created</span>
+                  <span class="text-sm text-gray-900">{{ formatDate(company.createdAt) }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-gray-600">Last Updated</span>
+                  <span class="text-sm text-gray-900">{{ formatDate(company.updatedAt) }}</span>
+                </div>
+              </div>
+            </template>
+          </Card>
+
+          <!-- Parent Company -->
+          <Card v-if="parentCompany">
+            <template #title>
+              <div class="flex items-center">
+                <i class="pi pi-sitemap text-purple-600 mr-2"></i>
+                <span>Parent Company</span>
+              </div>
+            </template>
+            <template #content>
+              <div class="space-y-3">
                 <div>
-                  <h4 class="font-semibold text-gray-900 mb-1">
-                    Company Address
-                  </h4>
-                  <p class="text-gray-600 leading-relaxed">
-                    {{ company.address }}
-                  </p>
+                  <label class="text-sm font-medium text-gray-700">Name</label>
+                  <p class="text-lg font-semibold text-gray-900">{{ parentCompany.name }}</p>
                 </div>
+                <div>
+                  <label class="text-sm font-medium text-gray-700">Industry</label>
+                  <p class="text-gray-900">{{ parentCompany.industry }}</p>
+                </div>
+                <BaseButton
+                  label="View Parent"
+                  icon="pi pi-external-link"
+                  variant="outline"
+                  size="small"
+                  padding="compact"
+                  @click="$router.push(`/companies/${parentCompany.id}`)"
+                />
               </div>
+            </template>
+          </Card>
 
-              <div
-                v-if="company.parentId"
-                class="mt-6 p-4 bg-blue-50 rounded-lg"
-              >
-                <div class="flex items-center space-x-2 mb-2">
-                  <i class="pi pi-building text-blue-600"></i>
-                  <span class="font-semibold text-blue-900"
-                    >Parent Company</span
-                  >
-                </div>
-                <p class="text-blue-800">
-                  {{ getParentCompanyName(company.parentId) }}
-                </p>
+          <!-- Social Media -->
+          <Card v-if="hasSocialMedia">
+            <template #title>
+              <div class="flex items-center">
+                <i class="pi pi-globe text-blue-600 mr-2"></i>
+                <span>Social Media</span>
               </div>
-            </div>
-          </template>
-        </Card>
+            </template>
+            <template #content>
+              <div class="space-y-3">
+                <div v-if="company.socialMedia?.linkedin">
+                  <a :href="company.socialMedia.linkedin" target="_blank" class="flex items-center text-blue-600 hover:text-blue-800">
+                    <i class="pi pi-linkedin mr-2"></i>
+                    <span>LinkedIn</span>
+                  </a>
+                </div>
+                <div v-if="company.socialMedia?.twitter">
+                  <a :href="company.socialMedia.twitter" target="_blank" class="flex items-center text-blue-600 hover:text-blue-800">
+                    <i class="pi pi-twitter mr-2"></i>
+                    <span>Twitter</span>
+                  </a>
+                </div>
+                <div v-if="company.socialMedia?.facebook">
+                  <a :href="company.socialMedia.facebook" target="_blank" class="flex items-center text-blue-600 hover:text-blue-800">
+                    <i class="pi pi-facebook mr-2"></i>
+                    <span>Facebook</span>
+                  </a>
+                </div>
+                <div v-if="company.socialMedia?.instagram">
+                  <a :href="company.socialMedia.instagram" target="_blank" class="flex items-center text-blue-600 hover:text-blue-800">
+                    <i class="pi pi-instagram mr-2"></i>
+                    <span>Instagram</span>
+                  </a>
+                </div>
+              </div>
+            </template>
+          </Card>
+        </div>
       </div>
 
       <!-- Recent Activity -->
@@ -305,146 +279,137 @@
             </div>
             <BaseButton
               label="View All"
-              variant="text"
+              icon="pi pi-arrow-right"
+              variant="outline"
               size="small"
-              @click="viewActivity"
+              padding="compact"
+              @click="$router.push('/dashboard')"
             />
           </div>
         </template>
         <template #content>
           <div class="space-y-4">
-            <div
-              class="flex items-center space-x-3 py-3 border-b border-gray-100"
-            >
-              <div
-                class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center"
-              >
-                <i class="pi pi-plus text-green-600 text-sm"></i>
-              </div>
+            <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+              <div class="w-2 h-2 bg-green-500 rounded-full"></div>
               <div class="flex-1">
-                <p class="text-sm font-medium text-gray-900">
-                  New employee added
-                </p>
-                <p class="text-xs text-gray-500">2 hours ago</p>
+                <p class="text-sm text-gray-900">Company profile updated</p>
+                <p class="text-xs text-gray-500">{{ formatDate(company.updatedAt) }}</p>
               </div>
             </div>
-
-            <div
-              class="flex items-center space-x-3 py-3 border-b border-gray-100"
-            >
-              <div
-                class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center"
-              >
-                <i class="pi pi-pencil text-blue-600 text-sm"></i>
-              </div>
+            <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+              <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
               <div class="flex-1">
-                <p class="text-sm font-medium text-gray-900">
-                  Company information updated
-                </p>
-                <p class="text-xs text-gray-500">1 day ago</p>
-              </div>
-            </div>
-
-            <div class="flex items-center space-x-3 py-3">
-              <div
-                class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center"
-              >
-                <i class="pi pi-sitemap text-purple-600 text-sm"></i>
-              </div>
-              <div class="flex-1">
-                <p class="text-sm font-medium text-gray-900">
-                  New department created
-                </p>
-                <p class="text-xs text-gray-500">3 days ago</p>
+                <p class="text-sm text-gray-900">Company created</p>
+                <p class="text-xs text-gray-500">{{ formatDate(company.createdAt) }}</p>
               </div>
             </div>
           </div>
         </template>
       </Card>
     </div>
-
-    <!-- Not Found State -->
-    <div v-else class="text-center py-12">
-      <div
-        class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"
-      >
-        <i class="pi pi-exclamation-triangle text-gray-400 text-2xl"></i>
-      </div>
-      <h3 class="text-lg font-semibold text-gray-900 mb-2">
-        Company Not Found
-      </h3>
-      <p class="text-gray-600 mb-6">
-        The company you're looking for doesn't exist or has been removed.
-      </p>
-      <BaseButton
-        label="Back to Companies"
-        variant="primary"
-        @click="$router.push('/companies')"
-      />
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { ref, computed, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import { useCompaniesStore } from "@/stores/companies";
-import { BaseButton } from "@/components/ui";
 import Card from "primevue/card";
+import Tag from "primevue/tag";
+import { BaseButton } from "@/components/ui";
 
-const route = useRoute();
 const router = useRouter();
+const route = useRoute();
 const companiesStore = useCompaniesStore();
 
-const companyId = computed(() => route.params.id as string);
-const loading = ref(false);
-const error = ref<string | null>(null);
-const company = ref<any>(null);
+// Route params
+const companyId = route.params.id as string;
+
+// Component state
+const loading = ref(true);
+const error = ref("");
+
+// Computed properties
+const company = computed(() => {
+  return companiesStore.getCompanyById(companyId);
+});
+
+const parentCompany = computed(() => {
+  if (!company.value?.parentId) return null;
+  return companiesStore.getCompanyById(company.value.parentId);
+});
+
+const hasSocialMedia = computed(() => {
+  const social = company.value?.socialMedia;
+  return social && (social.linkedin || social.twitter || social.facebook || social.instagram);
+});
 
 // Methods
-const fetchCompanyDetails = async () => {
+const loadCompany = async () => {
   loading.value = true;
-  error.value = null;
+  error.value = "";
 
   try {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await companiesStore.fetchCompanies();
 
-    const foundCompany = companiesStore.getCompanyById(companyId.value);
-    if (foundCompany) {
-      company.value = foundCompany;
-    } else {
+    if (!company.value) {
       error.value = "Company not found";
     }
   } catch (err) {
-    error.value = "Failed to load company details";
-    console.error("Error fetching company:", err);
+    error.value = "Failed to load company data";
+    console.error("Error loading company:", err);
   } finally {
     loading.value = false;
   }
 };
 
-const getParentCompanyName = (parentId: string) => {
-  const parent = companiesStore.companies.find((c) => c.id === parentId);
-  return parent?.name || "Unknown Parent Company";
+const getStatusSeverity = (status: string) => {
+  switch (status?.toLowerCase()) {
+    case 'active':
+      return 'success';
+    case 'inactive':
+      return 'danger';
+    case 'pending':
+      return 'warning';
+    case 'suspended':
+      return 'secondary';
+    default:
+      return 'info';
+  }
+};
+
+const getCountryName = (countryCode: string) => {
+  const countries: { [key: string]: string } = {
+    'US': 'United States',
+    'CA': 'Canada',
+    'UK': 'United Kingdom',
+    'DE': 'Germany',
+    'FR': 'France',
+    'AU': 'Australia',
+    'JP': 'Japan',
+    'CN': 'China',
+    'IN': 'India',
+    'BR': 'Brazil',
+  };
+  return countries[countryCode] || countryCode;
+};
+
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('en-US').format(amount);
 };
 
 const formatDate = (dateString: string) => {
-  if (!dateString) return "";
-  return new Date(dateString).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+  if (!dateString) return 'N/A';
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   });
 };
 
-const viewActivity = () => {
-  // Navigate to activity page or show modal
-  console.log("View activity for company:", company.value?.id);
-};
-
+// Load data on mount
 onMounted(() => {
-  fetchCompanyDetails();
+  loadCompany();
 });
 </script>
 
@@ -505,3 +470,4 @@ onMounted(() => {
   }
 }
 </style>
+

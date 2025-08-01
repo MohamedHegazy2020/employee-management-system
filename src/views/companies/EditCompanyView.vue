@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-6">
-    <!-- Header with Breadcrumb -->
+    <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
         <nav class="flex items-center space-x-2 text-sm text-gray-500 mb-2">
@@ -15,14 +15,16 @@
             :to="`/companies/${companyId}`"
             class="hover:text-blue-600 transition-colors"
           >
-            {{ company?.name || "Loading..." }}
+            {{ company?.name }}
           </router-link>
           <i class="pi pi-chevron-right text-xs"></i>
-          <span class="text-gray-900 font-medium">Edit</span>
+          <span class="text-gray-900 font-medium">Edit Company</span>
         </nav>
-        <h1 class="text-3xl font-bold text-gray-900">Edit Company</h1>
+        <h1 class="text-3xl font-bold text-gray-900">
+          Edit Company: {{ company?.name }}
+        </h1>
         <p class="mt-1 text-sm text-gray-600">
-          Update company information and details
+          Update company information and details.
         </p>
       </div>
 
@@ -54,27 +56,30 @@
         <div
           class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"
         ></div>
-        <p class="mt-4 text-gray-600">Loading company details...</p>
+        <p class="mt-4 text-gray-600">Loading company data...</p>
       </div>
     </div>
 
     <!-- Error State -->
-    <div
-      v-else-if="error"
-      class="bg-red-50 border border-red-200 rounded-xl p-6"
-    >
-      <div class="flex items-center">
-        <i class="pi pi-exclamation-triangle text-red-500 text-xl mr-3"></i>
-        <div>
-          <h3 class="text-red-800 font-semibold">Error Loading Company</h3>
-          <p class="text-red-600 mt-1">{{ error }}</p>
-        </div>
+    <div v-else-if="error" class="text-center py-12">
+      <div class="text-red-600 mb-4">
+        <i class="pi pi-exclamation-triangle text-4xl"></i>
       </div>
+      <h3 class="text-lg font-semibold text-gray-900 mb-2">
+        Error Loading Company
+      </h3>
+      <p class="text-gray-600 mb-4">{{ error }}</p>
+      <BaseButton
+        label="Try Again"
+        icon="pi pi-refresh"
+        variant="primary"
+        @click="loadCompany"
+      />
     </div>
 
-    <!-- Edit Form -->
-    <div v-else-if="company" class="space-y-6">
-      <!-- Success Message -->
+    <!-- Company Form -->
+    <div v-else-if="company">
+      <!-- Success/Error Messages -->
       <Message
         v-if="successMessage"
         severity="success"
@@ -84,7 +89,6 @@
         {{ successMessage }}
       </Message>
 
-      <!-- Error Message -->
       <Message
         v-if="formError"
         severity="error"
@@ -94,235 +98,287 @@
         {{ formError }}
       </Message>
 
-      <!-- Company Information Form -->
       <BaseForm
         :loading="saving"
         :show-default-actions="false"
         title="Company Information"
-        description="Update the basic information about the company"
+        description="Update company details and information"
       >
         <template #content>
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Company Name -->
-            <BaseInput
-              v-model="formData.name"
-              label="Company Name"
-              placeholder="Enter company name"
-              icon="pi pi-building"
-              :error="errors.name"
-              required
-            />
+          <!-- Basic Information -->
+          <div class="space-y-6">
+            <h3
+              class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2"
+            >
+              <i class="pi pi-building text-blue-600 mr-2"></i>
+              Basic Information
+            </h3>
 
-            <!-- Company Code -->
-            <BaseInput
-              v-model="formData.code"
-              label="Company Code"
-              placeholder="Enter company code"
-              icon="pi pi-tag"
-              :error="errors.code"
-              required
-            />
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <BaseInput
+                v-model="formData.name"
+                label="Company Name"
+                placeholder="Enter company name"
+                :error="errors.name"
+                required
+              />
 
-            <!-- Email Address -->
-            <BaseInput
-              v-model="formData.email"
-              label="Email Address"
-              type="email"
-              placeholder="Enter email address"
-              icon="pi pi-envelope"
-              :error="errors.email"
-              required
-            />
+              <BaseInput
+                v-model="formData.code"
+                label="Company Code"
+                placeholder="Enter company code"
+                :error="errors.code"
+                required
+              />
 
-            <!-- Phone Number -->
-            <BaseInput
-              v-model="formData.phone"
-              label="Phone Number"
-              type="tel"
-              placeholder="Enter phone number"
-              icon="pi pi-phone"
-              :error="errors.phone"
-              required
-            />
+              <BaseInput
+                v-model="formData.email"
+                label="Email Address"
+                type="email"
+                placeholder="Enter company email"
+                :error="errors.email"
+                required
+              />
 
-            <!-- Website -->
-            <BaseInput
-              v-model="formData.website"
-              label="Website"
-              type="url"
-              placeholder="Enter website URL"
-              icon="pi pi-globe"
-              :error="errors.website"
-              hint="Optional - Include https://"
-            />
+              <BaseInput
+                v-model="formData.phone"
+                label="Phone Number"
+                type="tel"
+                placeholder="Enter company phone"
+                :error="errors.phone"
+                required
+              />
 
-            <!-- Parent Company -->
-            <BaseDropdown
-              v-model="formData.parentId"
-              label="Parent Company"
-              :options="parentCompanyOptions"
-              option-label="name"
-              option-value="id"
-              placeholder="Select parent company"
-              :error="errors.parentId"
-              :show-clear="true"
-              hint="Optional - Leave empty if this is a parent company"
+              <BaseInput
+                v-model="formData.website"
+                label="Website"
+                type="url"
+                placeholder="Enter company website"
+                :error="errors.website"
+                hint="e.g., https://example.com"
+              />
+
+              <BaseDropdown
+                v-model="formData.industry"
+                label="Industry"
+                :options="industryOptions"
+                placeholder="Select industry"
+                :error="errors.industry"
+                required
+              />
+
+              <BaseDropdown
+                v-model="formData.size"
+                label="Company Size"
+                :options="sizeOptions"
+                placeholder="Select company size"
+                :error="errors.size"
+                required
+              />
+
+              <BaseDropdown
+                v-model="formData.status"
+                label="Status"
+                :options="statusOptions"
+                placeholder="Select status"
+                :error="errors.status"
+                required
+              />
+            </div>
+          </div>
+
+          <!-- Address Information -->
+          <div class="space-y-6 mt-8">
+            <h3
+              class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2"
+            >
+              <i class="pi pi-map-marker text-orange-600 mr-2"></i>
+              Address Information
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <BaseInput
+                v-model="formData.address.street"
+                label="Street Address"
+                placeholder="Enter street address"
+                :error="errors.address?.street"
+                required
+              />
+
+              <BaseInput
+                v-model="formData.address.city"
+                label="City"
+                placeholder="Enter city"
+                :error="errors.address?.city"
+                required
+              />
+
+              <BaseInput
+                v-model="formData.address.state"
+                label="State/Province"
+                placeholder="Enter state or province"
+                :error="errors.address?.state"
+                required
+              />
+
+              <BaseInput
+                v-model="formData.address.zipCode"
+                label="ZIP/Postal Code"
+                placeholder="Enter ZIP or postal code"
+                :error="errors.address?.zipCode"
+                required
+              />
+
+              <BaseDropdown
+                v-model="formData.address.country"
+                label="Country"
+                :options="countryOptions"
+                placeholder="Select country"
+                :error="errors.address?.country"
+                required
+              />
+            </div>
+          </div>
+
+          <!-- Additional Information -->
+          <div class="space-y-6 mt-8">
+            <h3
+              class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2"
+            >
+              <i class="pi pi-info-circle text-green-600 mr-2"></i>
+              Additional Information
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <BaseDropdown
+                v-model="formData.parentId"
+                label="Parent Company"
+                :options="parentCompanyOptions"
+                option-label="name"
+                option-value="id"
+                placeholder="Select parent company (optional)"
+                :show-clear="true"
+                :error="errors.parentId"
+                hint="Leave empty if this is a parent company"
+              />
+
+              <BaseInput
+                v-model.number="formData.foundedYear"
+                label="Founded Year"
+                type="number"
+                placeholder="Enter founded year"
+                :error="errors.foundedYear"
+                :min="1800"
+                :max="new Date().getFullYear()"
+              />
+
+              <BaseInput
+                v-model.number="formData.annualRevenue"
+                label="Annual Revenue"
+                type="number"
+                placeholder="Enter annual revenue"
+                :error="errors.annualRevenue"
+                hint="In USD"
+              />
+
+              <BaseInput
+                v-model.number="formData.employeeCount"
+                label="Number of Employees"
+                type="number"
+                placeholder="Enter employee count"
+                :error="errors.employeeCount"
+                :min="1"
+              />
+            </div>
+
+            <BaseTextarea
+              v-model="formData.description"
+              label="Company Description"
+              placeholder="Enter company description"
+              :rows="4"
+              :error="errors.description"
+              hint="Brief description of the company's business and mission"
             />
           </div>
 
-          <!-- Address -->
-          <BaseTextarea
-            v-model="formData.address"
-            label="Company Address"
-            placeholder="Enter complete company address"
-            :rows="3"
-            icon="pi pi-map-marker"
-            :error="errors.address"
-            required
-          />
-        </template>
+          <!-- Social Media & Contact -->
+          <div class="space-y-6 mt-8">
+            <h3
+              class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2"
+            >
+              <i class="pi pi-globe text-purple-600 mr-2"></i>
+              Social Media & Contact
+            </h3>
 
-        <!-- Form Actions -->
-        <template #actions>
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-2 text-sm text-gray-500">
-              <i class="pi pi-info-circle"></i>
-              <span>All fields marked with * are required</span>
-            </div>
-
-            <div class="flex items-center space-x-3">
-              <BaseButton
-                label="Reset Form"
-                icon="pi pi-refresh"
-                variant="outline"
-                @click="resetForm"
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <BaseInput
+                v-model="formData.socialMedia.linkedin"
+                label="LinkedIn"
+                placeholder="Enter LinkedIn URL"
+                :error="errors.socialMedia?.linkedin"
               />
-              <BaseButton
-                label="Save Changes"
-                icon="pi pi-check"
-                variant="primary"
-                :loading="saving"
-                @click="handleSubmit"
+
+              <BaseInput
+                v-model="formData.socialMedia.twitter"
+                label="Twitter"
+                placeholder="Enter Twitter URL"
+                :error="errors.socialMedia?.twitter"
+              />
+
+              <BaseInput
+                v-model="formData.socialMedia.facebook"
+                label="Facebook"
+                placeholder="Enter Facebook URL"
+                :error="errors.socialMedia?.facebook"
+              />
+
+              <BaseInput
+                v-model="formData.socialMedia.instagram"
+                label="Instagram"
+                placeholder="Enter Instagram URL"
+                :error="errors.socialMedia?.instagram"
               />
             </div>
           </div>
         </template>
       </BaseForm>
 
-      <!-- Additional Information -->
-      <Card>
-        <template #title>
-          <div class="flex items-center">
-            <i class="pi pi-info-circle text-blue-600 mr-2"></i>
-            <span>Additional Information</span>
-          </div>
-        </template>
-        <template #content>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Created Date -->
-            <div class="space-y-2">
-              <label class="text-sm font-medium text-gray-700"
-                >Created Date</label
-              >
-              <div class="flex items-center space-x-2 text-gray-600">
-                <i class="pi pi-calendar text-gray-400"></i>
-                <span>{{ formatDate(company.createdAt) }}</span>
-              </div>
-            </div>
-
-            <!-- Last Updated -->
-            <div class="space-y-2">
-              <label class="text-sm font-medium text-gray-700"
-                >Last Updated</label
-              >
-              <div class="flex items-center space-x-2 text-gray-600">
-                <i class="pi pi-clock text-gray-400"></i>
-                <span>{{ formatDate(company.updatedAt) }}</span>
-              </div>
-            </div>
-
-            <!-- Employee Count -->
-            <div class="space-y-2">
-              <label class="text-sm font-medium text-gray-700"
-                >Total Employees</label
-              >
-              <div class="flex items-center space-x-2 text-gray-600">
-                <i class="pi pi-users text-gray-400"></i>
-                <span>{{ company.employeeCount }} employees</span>
-              </div>
-            </div>
-
-            <!-- Department Count -->
-            <div class="space-y-2">
-              <label class="text-sm font-medium text-gray-700"
-                >Departments</label
-              >
-              <div class="flex items-center space-x-2 text-gray-600">
-                <i class="pi pi-sitemap text-gray-400"></i>
-                <span>{{ company.departmentCount }} departments</span>
-              </div>
-            </div>
-          </div>
-        </template>
-      </Card>
-
       <!-- Danger Zone -->
-      <Card class="border-red-200 bg-red-50">
+      <Card class="mt-8 border-red-200 bg-red-50">
         <template #title>
-          <div class="flex items-center">
-            <i class="pi pi-exclamation-triangle text-red-600 mr-2"></i>
-            <span class="text-red-800">Danger Zone</span>
+          <div class="flex items-center text-red-700">
+            <i class="pi pi-exclamation-triangle mr-2"></i>
+            <span>Danger Zone</span>
           </div>
         </template>
         <template #content>
           <div class="space-y-4">
-            <div class="flex items-center justify-between">
-              <div>
-                <h4 class="font-semibold text-red-800">Delete Company</h4>
-                <p class="text-red-600 text-sm mt-1">
-                  Permanently delete this company and all associated data. This
-                  action cannot be undone.
-                </p>
-              </div>
-              <BaseButton
-                label="Delete Company"
-                icon="pi pi-trash"
-                variant="danger"
-                @click="confirmDelete"
-              />
-            </div>
+            <p class="text-sm text-red-600">
+              Once you delete a company, there is no going back. This will also
+              delete all associated employees and departments.
+            </p>
+            <BaseButton
+              label="Delete Company"
+              icon="pi pi-trash"
+              variant="danger"
+              size="medium"
+              padding="normal"
+              @click="confirmDelete"
+            />
           </div>
         </template>
       </Card>
-    </div>
-
-    <!-- Not Found State -->
-    <div v-else class="text-center py-12">
-      <div
-        class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"
-      >
-        <i class="pi pi-exclamation-triangle text-gray-400 text-2xl"></i>
-      </div>
-      <h3 class="text-lg font-semibold text-gray-900 mb-2">
-        Company Not Found
-      </h3>
-      <p class="text-gray-600 mb-6">
-        The company you're trying to edit doesn't exist or has been removed.
-      </p>
-      <BaseButton
-        label="Back to Companies"
-        variant="primary"
-        @click="$router.push('/companies')"
-      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { useConfirm } from "primevue/useconfirm";
+import { ref, reactive, computed, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import { useCompaniesStore } from "@/stores/companies";
+import { useConfirm } from "primevue/useconfirm";
+import Card from "primevue/card";
+import Message from "primevue/message";
 import {
   BaseForm,
   BaseInput,
@@ -330,21 +386,22 @@ import {
   BaseDropdown,
   BaseButton,
 } from "@/components/ui";
-import Card from "primevue/card";
-import Message from "primevue/message";
 
-const route = useRoute();
 const router = useRouter();
+const route = useRoute();
 const confirm = useConfirm();
+
 const companiesStore = useCompaniesStore();
 
-const companyId = computed(() => route.params.id as string);
-const loading = ref(false);
+// Route params
+const companyId = route.params.id as string;
+
+// Component state
+const loading = ref(true);
 const saving = ref(false);
-const error = ref<string | null>(null);
+const error = ref("");
 const successMessage = ref("");
 const formError = ref("");
-const company = ref<any>(null);
 
 // Form data
 const formData = reactive({
@@ -353,113 +410,263 @@ const formData = reactive({
   email: "",
   phone: "",
   website: "",
-  address: "",
-  parentId: null as string | null,
+  industry: null,
+  size: null,
+  status: null,
+  parentId: null,
+  foundedYear: null,
+  annualRevenue: null,
+  employeeCount: null,
+  description: "",
+  address: {
+    street: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    country: null,
+  },
+  socialMedia: {
+    linkedin: "",
+    twitter: "",
+    facebook: "",
+    instagram: "",
+  },
 });
 
-// Form validation errors
+// Validation errors
 const errors = reactive({
   name: "",
   code: "",
   email: "",
   phone: "",
   website: "",
-  address: "",
+  industry: "",
+  size: "",
+  status: "",
   parentId: "",
+  foundedYear: "",
+  annualRevenue: "",
+  employeeCount: "",
+  description: "",
+  address: {
+    street: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    country: "",
+  },
+  socialMedia: {
+    linkedin: "",
+    twitter: "",
+    facebook: "",
+    instagram: "",
+  },
 });
 
+// Options
+const industryOptions = [
+  { label: "Technology", value: "Technology" },
+  { label: "Healthcare", value: "Healthcare" },
+  { label: "Finance", value: "Finance" },
+  { label: "Education", value: "Education" },
+  { label: "Manufacturing", value: "Manufacturing" },
+  { label: "Retail", value: "Retail" },
+  { label: "Consulting", value: "Consulting" },
+  { label: "Real Estate", value: "Real Estate" },
+  { label: "Transportation", value: "Transportation" },
+  { label: "Energy", value: "Energy" },
+  { label: "Media & Entertainment", value: "Media & Entertainment" },
+  { label: "Other", value: "Other" },
+];
+
+const sizeOptions = [
+  { label: "Small (1-50)", value: "Small" },
+  { label: "Medium (51-200)", value: "Medium" },
+  { label: "Large (201-1000)", value: "Large" },
+  { label: "Enterprise (1000+)", value: "Enterprise" },
+];
+
+const statusOptions = [
+  { label: "Active", value: "Active" },
+  { label: "Inactive", value: "Inactive" },
+  { label: "Pending", value: "Pending" },
+  { label: "Suspended", value: "Suspended" },
+];
+
+const countryOptions = [
+  { label: "United States", value: "US" },
+  { label: "Canada", value: "CA" },
+  { label: "United Kingdom", value: "UK" },
+  { label: "Germany", value: "DE" },
+  { label: "France", value: "FR" },
+  { label: "Australia", value: "AU" },
+  { label: "Japan", value: "JP" },
+  { label: "China", value: "CN" },
+  { label: "India", value: "IN" },
+  { label: "Brazil", value: "BR" },
+];
+
 // Computed properties
+const company = computed(() => {
+  return companiesStore.getCompanyById(companyId);
+});
+
 const parentCompanyOptions = computed(() => {
   return companiesStore.companies
-    .filter((c) => c.id !== companyId.value)
-    .map((c) => ({ id: c.id, name: c.name }));
+    .filter((comp) => comp.id !== companyId && !comp.parentId) // Exclude current company and companies with parents
+    .map((comp) => ({
+      id: comp.id,
+      name: comp.name,
+    }));
 });
 
 // Methods
-const fetchCompanyDetails = async () => {
+const loadCompany = async () => {
   loading.value = true;
-  error.value = null;
+  error.value = "";
 
   try {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await companiesStore.fetchCompanies();
 
-    const foundCompany = companiesStore.getCompanyById(companyId.value);
-    if (foundCompany) {
-      company.value = foundCompany;
-      populateForm(foundCompany);
-    } else {
+    const companyData = company.value;
+    if (!companyData) {
       error.value = "Company not found";
+      return;
     }
+
+    // Populate form data
+    Object.assign(formData, {
+      name: companyData.name || "",
+      code: companyData.code || "",
+      email: companyData.email || "",
+      phone: companyData.phone || "",
+      website: companyData.website || "",
+      industry: companyData.industry || null,
+      size: companyData.size || null,
+      status: companyData.status || null,
+      parentId: companyData.parentId || null,
+      foundedYear: companyData.foundedYear || null,
+      annualRevenue: companyData.annualRevenue || null,
+      employeeCount: companyData.employeeCount || null,
+      description: companyData.description || "",
+      address: {
+        street: companyData.address?.street || "",
+        city: companyData.address?.city || "",
+        state: companyData.address?.state || "",
+        zipCode: companyData.address?.zipCode || "",
+        country: companyData.address?.country || null,
+      },
+      socialMedia: {
+        linkedin: companyData.socialMedia?.linkedin || "",
+        twitter: companyData.socialMedia?.twitter || "",
+        facebook: companyData.socialMedia?.facebook || "",
+        instagram: companyData.socialMedia?.instagram || "",
+      },
+    });
   } catch (err) {
-    error.value = "Failed to load company details";
-    console.error("Error fetching company:", err);
+    error.value = "Failed to load company data";
+    console.error("Error loading company:", err);
   } finally {
     loading.value = false;
   }
 };
 
-const populateForm = (companyData: any) => {
-  formData.name = companyData.name;
-  formData.code = companyData.code;
-  formData.email = companyData.email;
-  formData.phone = companyData.phone;
-  formData.website = companyData.website || "";
-  formData.address = companyData.address;
-  formData.parentId = companyData.parentId || null;
-};
-
 const validateForm = () => {
-  // Reset errors
-  Object.keys(errors).forEach((key) => {
-    errors[key as keyof typeof errors] = "";
-  });
-
   let isValid = true;
 
-  // Name validation
+  // Clear previous errors
+  Object.keys(errors).forEach((key) => {
+    if (typeof errors[key] === "object") {
+      Object.keys(errors[key]).forEach((subKey) => {
+        errors[key][subKey] = "";
+      });
+    } else {
+      errors[key] = "";
+    }
+  });
+
+  // Required field validation
   if (!formData.name.trim()) {
     errors.name = "Company name is required";
     isValid = false;
-  } else if (formData.name.length < 2) {
-    errors.name = "Company name must be at least 2 characters";
-    isValid = false;
   }
 
-  // Code validation
   if (!formData.code.trim()) {
     errors.code = "Company code is required";
     isValid = false;
-  } else if (formData.code.length < 3) {
-    errors.code = "Company code must be at least 3 characters";
-    isValid = false;
   }
 
-  // Email validation
   if (!formData.email.trim()) {
-    errors.email = "Email address is required";
+    errors.email = "Email is required";
     isValid = false;
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
     errors.email = "Please enter a valid email address";
     isValid = false;
   }
 
-  // Phone validation
   if (!formData.phone.trim()) {
     errors.phone = "Phone number is required";
     isValid = false;
   }
 
-  // Address validation
-  if (!formData.address.trim()) {
-    errors.address = "Company address is required";
+  if (!formData.industry) {
+    errors.industry = "Industry is required";
     isValid = false;
   }
 
-  // Website validation (optional)
+  if (!formData.size) {
+    errors.size = "Company size is required";
+    isValid = false;
+  }
+
+  if (!formData.status) {
+    errors.status = "Status is required";
+    isValid = false;
+  }
+
+  // Address validation
+  if (!formData.address.street.trim()) {
+    errors.address.street = "Street address is required";
+    isValid = false;
+  }
+
+  if (!formData.address.city.trim()) {
+    errors.address.city = "City is required";
+    isValid = false;
+  }
+
+  if (!formData.address.state.trim()) {
+    errors.address.state = "State is required";
+    isValid = false;
+  }
+
+  if (!formData.address.zipCode.trim()) {
+    errors.address.zipCode = "ZIP code is required";
+    isValid = false;
+  }
+
+  if (!formData.address.country) {
+    errors.address.country = "Country is required";
+    isValid = false;
+  }
+
+  // Optional field validation
   if (formData.website && !/^https?:\/\/.+/.test(formData.website)) {
-    errors.website =
-      "Please enter a valid website URL (include http:// or https://)";
+    errors.website = "Please enter a valid website URL";
+    isValid = false;
+  }
+
+  if (
+    formData.foundedYear &&
+    (formData.foundedYear < 1800 ||
+      formData.foundedYear > new Date().getFullYear())
+  ) {
+    errors.foundedYear = "Please enter a valid founded year";
+    isValid = false;
+  }
+
+  if (formData.employeeCount && formData.employeeCount < 1) {
+    errors.employeeCount = "Employee count must be at least 1";
     isValid = false;
   }
 
@@ -468,7 +675,7 @@ const validateForm = () => {
 
 const handleSubmit = async () => {
   if (!validateForm()) {
-    formError.value = "Please fix the errors above before submitting";
+    formError.value = "Please fix the errors above before submitting.";
     return;
   }
 
@@ -476,68 +683,58 @@ const handleSubmit = async () => {
   formError.value = "";
 
   try {
-    await companiesStore.updateCompany(companyId.value, formData);
+    const companyData = {
+      ...formData,
+      id: companyId,
+      updatedAt: new Date().toISOString(),
+    };
+
+    await companiesStore.updateCompany(companyId, companyData);
+
     successMessage.value = "Company updated successfully!";
 
-    // Redirect after a short delay
+    // Redirect after successful update
     setTimeout(() => {
-      router.push(`/companies/${companyId.value}`);
-    }, 1500);
-  } catch (err) {
+      router.push(`/companies/${companyId}`);
+    }, 2000);
+  } catch (error) {
     formError.value = "Failed to update company. Please try again.";
-    console.error("Error updating company:", err);
+    console.error("Error updating company:", error);
   } finally {
     saving.value = false;
   }
 };
 
-const resetForm = () => {
-  if (company.value) {
-    populateForm(company.value);
-  }
-  Object.keys(errors).forEach((key) => {
-    errors[key as keyof typeof errors] = "";
-  });
-  formError.value = "";
-  successMessage.value = "";
-};
-
 const confirmDelete = () => {
   confirm.require({
-    message: `Are you sure you want to delete ${company.value?.name}? This action cannot be undone and will permanently remove all associated data.`,
-    header: "Delete Company Confirmation",
+    message: `Are you sure you want to delete ${company.value?.name}? This action cannot be undone and will delete all associated employees and departments.`,
+    header: "Delete Company",
     icon: "pi pi-exclamation-triangle",
     acceptClass: "p-button-danger",
-    accept: () => handleDelete(),
+    accept: () => deleteCompany(),
     reject: () => {
-      // Rejection handled
+      // User rejected the deletion
     },
   });
 };
 
-const handleDelete = async () => {
+const deleteCompany = async () => {
   try {
-    await companiesStore.deleteCompany(companyId.value);
-    router.push("/companies");
-  } catch (err) {
+    await companiesStore.deleteCompany(companyId);
+    successMessage.value = "Company deleted successfully!";
+
+    setTimeout(() => {
+      router.push("/companies");
+    }, 2000);
+  } catch (error) {
     formError.value = "Failed to delete company. Please try again.";
-    console.error("Error deleting company:", err);
+    console.error("Error deleting company:", error);
   }
 };
 
-const formatDate = (dateString: string) => {
-  if (!dateString) return "";
-  return new Date(dateString).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
-
+// Load data on mount
 onMounted(() => {
-  fetchCompanyDetails();
+  loadCompany();
 });
 </script>
 
