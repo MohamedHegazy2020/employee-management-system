@@ -1,177 +1,417 @@
 <template>
   <div class="space-y-6">
-    <!-- Page header -->
+    <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Create Department</h1>
-        <p class="text-gray-600">Add a new department to your organization.</p>
+        <nav class="flex items-center space-x-2 text-sm text-gray-500 mb-2">
+          <router-link
+            to="/departments"
+            class="hover:text-blue-600 transition-colors"
+          >
+            Departments
+          </router-link>
+          <i class="pi pi-chevron-right text-xs"></i>
+          <span class="text-gray-900 font-medium">Add New Department</span>
+        </nav>
+        <h1 class="text-3xl font-bold text-gray-900">Add New Department</h1>
+        <p class="mt-1 text-sm text-gray-600">
+          Create a new department record with complete information.
+        </p>
       </div>
-      <BaseButton
-        label="Back to Departments"
-        icon="pi pi-arrow-left"
-        variant="secondary"
-        size="medium"
-        padding="normal"
-        @click="$router.push('/departments')"
-      />
+
+      <!-- Action Buttons -->
+      <div class="flex items-center space-x-3">
+        <BaseButton
+          label="Cancel"
+          icon="pi pi-times"
+          variant="secondary"
+          size="medium"
+          padding="normal"
+          @click="$router.push('/departments')"
+        />
+        <BaseButton
+          label="Save Department"
+          icon="pi pi-check"
+          variant="primary"
+          size="medium"
+          padding="normal"
+          :loading="saving"
+          @click="handleSubmit"
+        />
+      </div>
     </div>
 
-    <!-- Form -->
-    <Card class="max-w-2xl">
-      <template #content>
-        <BaseForm
-          :loading="loading"
-          submit-text="Create Department"
-          submit-variant="primary"
-          layout="grid"
-          :grid-cols="2"
-          @submit="handleSubmit"
-          @cancel="$router.push('/departments')"
-        >
-          <BaseInput
-            v-model="form.name"
-            label="Department Name"
-            placeholder="Enter department name"
-            icon="pi pi-building"
-            :error="errors.name"
-            required
-          />
-
-          <BaseInput
-            v-model="form.code"
-            label="Department Code"
-            placeholder="Enter department code"
-            icon="pi pi-tag"
-            :error="errors.code"
-            required
-          />
-
-          <BaseDropdown
-            v-model="form.companyId"
-            :options="companies"
-            label="Company"
-            placeholder="Select company"
-            option-label="name"
-            option-value="id"
-            :error="errors.companyId"
-            filter
-            filter-placeholder="Search companies..."
-            required
-          />
-
-          <BaseDropdown
-            v-model="form.managerId"
-            :options="employees"
-            label="Department Manager"
-            placeholder="Select manager (optional)"
-            option-label="name"
-            option-value="id"
-            :show-clear="true"
-            filter
-            filter-placeholder="Search employees..."
-          />
-
-          <BaseInput
-            v-model="form.email"
-            label="Department Email"
-            type="email"
-            placeholder="Enter department email"
-            icon="pi pi-envelope"
-            :error="errors.email"
-            required
-          />
-
-          <BaseInput
-            v-model="form.phone"
-            label="Department Phone"
-            type="tel"
-            placeholder="Enter department phone"
-            icon="pi pi-phone"
-            :error="errors.phone"
-            required
-          />
-
-          <BaseInput
-            v-model="form.location"
-            label="Location"
-            placeholder="Enter department location"
-            icon="pi pi-map-marker"
-            :error="errors.location"
-            required
-          />
-
-          <BaseInput
-            v-model="form.budget"
-            label="Annual Budget"
-            type="number"
-            placeholder="Enter annual budget"
-            icon="pi pi-dollar"
-            :error="errors.budget"
-            required
-          />
-
-          <BaseTextarea
-            v-model="form.description"
-            label="Description"
-            placeholder="Enter department description"
-            :rows="4"
-            class="md:col-span-2"
-          />
-
-          <BaseCheckbox
-            v-model="form.isActive"
-            label="Active Department"
-            class="md:col-span-2"
-          />
-        </BaseForm>
-      </template>
-    </Card>
-
-    <!-- Success Message -->
+    <!-- Success/Error Messages -->
     <Message
       v-if="successMessage"
       severity="success"
-      :closable="false"
-      class="max-w-2xl"
+      :closable="true"
+      @close="successMessage = ''"
     >
       {{ successMessage }}
     </Message>
+
+    <Message
+      v-if="formError"
+      severity="error"
+      :closable="true"
+      @close="formError = ''"
+    >
+      {{ formError }}
+    </Message>
+
+    <!-- Department Form -->
+    <BaseForm
+      :loading="saving"
+      :show-default-actions="false"
+      title="Department Information"
+      description="Complete department details and information"
+    >
+      <template #content>
+        <!-- Basic Information -->
+        <div class="space-y-6">
+          <h3
+            class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2"
+          >
+            <i class="pi pi-sitemap text-blue-600 mr-2"></i>
+            Basic Information
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <BaseInput
+              v-model="formData.name"
+              label="Department Name"
+              placeholder="Enter department name"
+              :error="errors.name"
+              required
+            />
+
+            <BaseInput
+              v-model="formData.code"
+              label="Department Code"
+              placeholder="Enter department code"
+              :error="errors.code"
+              required
+            />
+
+            <BaseDropdown
+              v-model="formData.companyId"
+              label="Company"
+              :options="companyOptions"
+              option-label="name"
+              option-value="id"
+              placeholder="Select company"
+              :error="errors.companyId"
+              :loading="companiesStore.loading"
+              required
+            />
+
+            <BaseDropdown
+              v-model="formData.managerId"
+              label="Department Manager"
+              :options="managerOptions"
+              option-label="name"
+              option-value="id"
+              placeholder="Select manager (optional)"
+              :show-clear="true"
+              :error="errors.managerId"
+              :loading="employeesStore.loading"
+            />
+
+            <BaseInput
+              v-model="formData.email"
+              label="Department Email"
+              type="email"
+              placeholder="Enter department email"
+              :error="errors.email"
+              required
+            />
+
+            <BaseInput
+              v-model="formData.phone"
+              label="Department Phone"
+              type="tel"
+              placeholder="Enter department phone"
+              :error="errors.phone"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- Location and Budget -->
+        <div class="space-y-6 mt-8">
+          <h3
+            class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2"
+          >
+            <i class="pi pi-map-marker text-orange-600 mr-2"></i>
+            Location and Budget
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <BaseInput
+              v-model="formData.location"
+              label="Location"
+              placeholder="Enter department location"
+              :error="errors.location"
+              required
+            />
+
+            <BaseInput
+              v-model.number="formData.budget"
+              label="Annual Budget"
+              type="number"
+              placeholder="Enter annual budget"
+              :error="errors.budget"
+              required
+            />
+
+            <BaseInput
+              v-model="formData.floor"
+              label="Floor/Level"
+              placeholder="Enter floor or level"
+              :error="errors.floor"
+            />
+
+            <BaseInput
+              v-model="formData.roomNumber"
+              label="Room Number"
+              placeholder="Enter room number"
+              :error="errors.roomNumber"
+            />
+          </div>
+        </div>
+
+        <!-- Department Details -->
+        <div class="space-y-6 mt-8">
+          <h3
+            class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2"
+          >
+            <i class="pi pi-info-circle text-green-600 mr-2"></i>
+            Department Details
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <BaseDropdown
+              v-model="formData.type"
+              label="Department Type"
+              :options="departmentTypeOptions"
+              placeholder="Select department type"
+              :error="errors.type"
+              required
+            />
+
+            <BaseDropdown
+              v-model="formData.status"
+              label="Status"
+              :options="statusOptions"
+              placeholder="Select status"
+              :error="errors.status"
+              required
+            />
+
+            <BaseInput
+              v-model.number="formData.maxEmployees"
+              label="Maximum Employees"
+              type="number"
+              placeholder="Enter maximum employees"
+              :error="errors.maxEmployees"
+              :min="1"
+            />
+
+            <BaseCalendar
+              v-model="formData.establishedDate"
+              label="Established Date"
+              placeholder="Select established date"
+              :error="errors.establishedDate"
+            />
+          </div>
+
+          <BaseTextarea
+            v-model="formData.description"
+            label="Department Description"
+            placeholder="Enter department description"
+            :rows="4"
+            :error="errors.description"
+            hint="Brief description of the department's purpose and responsibilities"
+          />
+        </div>
+
+        <!-- Skills and Requirements -->
+        <div class="space-y-6 mt-8">
+          <h3
+            class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2"
+          >
+            <i class="pi pi-star text-yellow-600 mr-2"></i>
+            Skills and Requirements
+          </h3>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                Required Skills
+              </label>
+              <div class="flex flex-wrap gap-2 mb-2">
+                <Tag
+                  v-for="skill in formData.requiredSkills"
+                  :key="skill"
+                  :value="skill"
+                  severity="info"
+                  class="cursor-pointer"
+                  @click="removeRequiredSkill(skill)"
+                />
+              </div>
+              <div class="flex gap-2">
+                <BaseInput
+                  v-model="newRequiredSkill"
+                  placeholder="Add a required skill"
+                  class="flex-1"
+                  @keyup.enter="addRequiredSkill"
+                />
+                <BaseButton
+                  label="Add"
+                  icon="pi pi-plus"
+                  variant="info"
+                  size="small"
+                  padding="compact"
+                  @click="addRequiredSkill"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                Preferred Certifications
+              </label>
+              <div class="flex flex-wrap gap-2 mb-2">
+                <Tag
+                  v-for="cert in formData.preferredCertifications"
+                  :key="cert"
+                  :value="cert"
+                  severity="success"
+                  class="cursor-pointer"
+                  @click="removePreferredCertification(cert)"
+                />
+              </div>
+              <div class="flex gap-2">
+                <BaseInput
+                  v-model="newPreferredCertification"
+                  placeholder="Add a preferred certification"
+                  class="flex-1"
+                  @keyup.enter="addPreferredCertification"
+                />
+                <BaseButton
+                  label="Add"
+                  icon="pi pi-plus"
+                  variant="success"
+                  size="small"
+                  padding="compact"
+                  @click="addPreferredCertification"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Settings -->
+        <div class="space-y-6 mt-8">
+          <h3
+            class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2"
+          >
+            <i class="pi pi-cog text-purple-600 mr-2"></i>
+            Additional Settings
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <BaseCheckbox
+              v-model="formData.isActive"
+              label="Active Department"
+              :error="errors.isActive"
+            />
+
+            <BaseCheckbox
+              v-model="formData.allowRemoteWork"
+              label="Allow Remote Work"
+              :error="errors.allowRemoteWork"
+            />
+
+            <BaseCheckbox
+              v-model="formData.hasBudget"
+              label="Has Budget Management"
+              :error="errors.hasBudget"
+            />
+
+            <BaseCheckbox
+              v-model="formData.requiresApproval"
+              label="Requires Approval for Hiring"
+              :error="errors.requiresApproval"
+            />
+          </div>
+        </div>
+      </template>
+    </BaseForm>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { useDepartmentsStore } from "@/stores/departments";
+import { useCompaniesStore } from "@/stores/companies";
+import { useEmployeesStore } from "@/stores/employees";
 import Card from "primevue/card";
 import Message from "primevue/message";
+import Tag from "primevue/tag";
 import {
   BaseForm,
   BaseInput,
   BaseTextarea,
   BaseDropdown,
+  BaseCalendar,
   BaseCheckbox,
   BaseButton,
 } from "@/components/ui";
 
 const router = useRouter();
-const loading = ref(false);
+const departmentsStore = useDepartmentsStore();
+const companiesStore = useCompaniesStore();
+const employeesStore = useEmployeesStore();
+
+// Form state
+const saving = ref(false);
 const successMessage = ref("");
+const formError = ref("");
 
-// Mock data - replace with actual API calls
-const companies = ref([
-  { id: "1", name: "Tech Corp" },
-  { id: "2", name: "Marketing Inc" },
-  { id: "3", name: "Sales Solutions" },
-]);
+// Skills and certifications
+const newRequiredSkill = ref("");
+const newPreferredCertification = ref("");
 
-const employees = ref([
-  { id: "1", name: "John Doe" },
-  { id: "2", name: "Jane Smith" },
-  { id: "3", name: "Bob Johnson" },
-  { id: "4", name: "Alice Brown" },
-]);
+// Form data
+const formData = reactive({
+  name: "",
+  code: "",
+  companyId: null,
+  managerId: null,
+  email: "",
+  phone: "",
+  location: "",
+  budget: null,
+  floor: "",
+  roomNumber: "",
+  type: null,
+  status: null,
+  maxEmployees: null,
+  establishedDate: null,
+  description: "",
+  requiredSkills: [] as string[],
+  preferredCertifications: [] as string[],
+  isActive: true,
+  allowRemoteWork: false,
+  hasBudget: true,
+  requiresApproval: false,
+});
 
-const form = reactive({
+// Validation errors
+const errors = reactive({
   name: "",
   code: "",
   companyId: "",
@@ -180,63 +420,121 @@ const form = reactive({
   phone: "",
   location: "",
   budget: "",
+  floor: "",
+  roomNumber: "",
+  type: "",
+  status: "",
+  maxEmployees: "",
+  establishedDate: "",
   description: "",
-  isActive: true,
+  isActive: "",
+  allowRemoteWork: "",
+  hasBudget: "",
+  requiresApproval: "",
 });
 
-const errors = reactive({
-  name: "",
-  code: "",
-  companyId: "",
-  email: "",
-  phone: "",
-  location: "",
-  budget: "",
+// Options
+const departmentTypeOptions = [
+  { label: "Administration", value: "Administration" },
+  { label: "Engineering", value: "Engineering" },
+  { label: "Sales", value: "Sales" },
+  { label: "Marketing", value: "Marketing" },
+  { label: "Human Resources", value: "Human Resources" },
+  { label: "Finance", value: "Finance" },
+  { label: "Operations", value: "Operations" },
+  { label: "Research & Development", value: "Research & Development" },
+  { label: "Customer Support", value: "Customer Support" },
+  { label: "Legal", value: "Legal" },
+  { label: "IT", value: "IT" },
+  { label: "Other", value: "Other" },
+];
+
+const statusOptions = [
+  { label: "Active", value: "Active" },
+  { label: "Inactive", value: "Inactive" },
+  { label: "Planning", value: "Planning" },
+  { label: "Suspended", value: "Suspended" },
+];
+
+// Computed properties
+const companyOptions = computed(() => {
+  return companiesStore.companies.map((company) => ({
+    id: company.id,
+    name: company.name,
+  }));
 });
 
+const managerOptions = computed(() => {
+  if (!formData.companyId) return [];
+  return employeesStore.employees
+    .filter((emp) => emp.companyId === formData.companyId)
+    .map((emp) => ({
+      id: emp.id,
+      name: `${emp.firstName} ${emp.lastName}`,
+    }));
+});
+
+// Methods
 const validateForm = () => {
-  // Reset errors
+  let isValid = true;
+
+  // Clear previous errors
   Object.keys(errors).forEach((key) => {
     errors[key] = "";
   });
 
-  let isValid = true;
-
-  if (!form.name.trim()) {
+  // Required field validation
+  if (!formData.name.trim()) {
     errors.name = "Department name is required";
     isValid = false;
   }
 
-  if (!form.code.trim()) {
+  if (!formData.code.trim()) {
     errors.code = "Department code is required";
     isValid = false;
   }
 
-  if (!form.companyId) {
+  if (!formData.companyId) {
     errors.companyId = "Company is required";
     isValid = false;
   }
 
-  if (!form.email.trim()) {
+  if (!formData.email.trim()) {
     errors.email = "Email is required";
     isValid = false;
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
     errors.email = "Please enter a valid email address";
     isValid = false;
   }
 
-  if (!form.phone.trim()) {
+  if (!formData.phone.trim()) {
     errors.phone = "Phone number is required";
     isValid = false;
   }
 
-  if (!form.location.trim()) {
+  if (!formData.location.trim()) {
     errors.location = "Location is required";
     isValid = false;
   }
 
-  if (!form.budget.trim()) {
-    errors.budget = "Budget is required";
+  if (!formData.budget || formData.budget <= 0) {
+    errors.budget = "Valid budget is required";
+    isValid = false;
+  }
+
+  if (!formData.type) {
+    errors.type = "Department type is required";
+    isValid = false;
+  }
+
+  if (!formData.status) {
+    errors.status = "Status is required";
+    isValid = false;
+  }
+
+  // Optional field validation
+  if (formData.maxEmployees && formData.maxEmployees < 1) {
+    errors.maxEmployees = "Maximum employees must be at least 1";
     isValid = false;
   }
 
@@ -244,43 +542,86 @@ const validateForm = () => {
 };
 
 const handleSubmit = async () => {
-  if (!validateForm()) return;
+  if (!validateForm()) {
+    formError.value = "Please fix the errors above before submitting.";
+    return;
+  }
 
-  loading.value = true;
+  saving.value = true;
+  formError.value = "";
 
   try {
-    // Mock API call - replace with actual implementation
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const departmentData = {
+      ...formData,
+      company: companiesStore.getCompanyById(formData.companyId)?.name || "",
+      manager: formData.managerId
+        ? employeesStore.getEmployeeById(formData.managerId)?.name || ""
+        : "",
+      employeeCount: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    await departmentsStore.createDepartment(departmentData);
 
     successMessage.value = "Department created successfully!";
 
-    // Reset form
-    Object.assign(form, {
-      name: "",
-      code: "",
-      companyId: "",
-      managerId: "",
-      email: "",
-      phone: "",
-      location: "",
-      budget: "",
-      description: "",
-      isActive: true,
-    });
-
-    // Redirect after a short delay
+    // Reset form after successful creation
     setTimeout(() => {
       router.push("/departments");
     }, 2000);
   } catch (error) {
-    console.error("Create department failed:", error);
+    formError.value = "Failed to create department. Please try again.";
+    console.error("Error creating department:", error);
   } finally {
-    loading.value = false;
+    saving.value = false;
   }
 };
 
+const addRequiredSkill = () => {
+  if (
+    newRequiredSkill.value.trim() &&
+    !formData.requiredSkills.includes(newRequiredSkill.value.trim())
+  ) {
+    formData.requiredSkills.push(newRequiredSkill.value.trim());
+    newRequiredSkill.value = "";
+  }
+};
+
+const removeRequiredSkill = (skill: string) => {
+  formData.requiredSkills = formData.requiredSkills.filter((s) => s !== skill);
+};
+
+const addPreferredCertification = () => {
+  if (
+    newPreferredCertification.value.trim() &&
+    !formData.preferredCertifications.includes(
+      newPreferredCertification.value.trim()
+    )
+  ) {
+    formData.preferredCertifications.push(
+      newPreferredCertification.value.trim()
+    );
+    newPreferredCertification.value = "";
+  }
+};
+
+const removePreferredCertification = (certification: string) => {
+  formData.preferredCertifications = formData.preferredCertifications.filter(
+    (c) => c !== certification
+  );
+};
+
+// Load data on mount
 onMounted(async () => {
-  // Load companies and employees data
-  // Replace with actual API calls
+  try {
+    await Promise.all([
+      companiesStore.fetchCompanies(),
+      employeesStore.fetchEmployees(),
+    ]);
+  } catch (error) {
+    console.error("Error loading data:", error);
+    formError.value = "Failed to load required data. Please refresh the page.";
+  }
 });
 </script>
