@@ -1,0 +1,367 @@
+{
+  "employees": [
+    {
+      "id": "1",
+      "firstName": "John",
+      "lastName": "Smith",
+      "email": "john.smith@techcorp.com",
+      "phone": "+1-555-0101",
+      "dateOfBirth": "1985-03-15",
+      "hireDate": "2024-01-15",
+      "position": "Senior Software Engineer",
+      "department": "Engineering",
+      "companyId": "1",
+      "managerId": null,
+      "salary": 95000,
+      "status": "active",
+      "avatar": "/avatars/john-smith.jpg",
+      "address": {
+        "street": "123 Main Street",
+        "city": "San Francisco",
+        "state": "CA",
+        "zipCode": "94102",
+        "country": "USA"
+      },
+      "emergencyContact": {
+        "name": "Jane Smith",
+        "relationship": "Spouse",
+        "phone": "+1-555-0102"
+      },
+      "skills": ["JavaScript", "React", "Node.js", "TypeScript"],
+      "certifications": [
+        "AWS Certified Developer",
+        "Google Cloud Professional"
+      ],
+      "performanceRating": 4.5,
+      "lastReviewDate": "2024-01-15"
+    },
+    {
+      "id": "2",
+      "firstName": "Sarah",
+      "lastName": "Johnson",
+      "email": "sarah.johnson@techcorp.com",
+      "phone": "+1-555-0103",
+      "dateOfBirth": "1990-07-22",
+      "hireDate": "2024-02-01",
+      "position": "Product Manager",
+      "department": "Product",
+      "companyId": "1",
+      "managerId": "1",
+      "salary": 110000,
+      "status": "active",
+      "avatar": "/avatars/sarah-johnson.jpg",
+      "address": {
+        "street": "456 Oak Avenue",
+        "city": "San Francisco",
+        "state": "CA",
+        "zipCode": "94103",
+        "country": "USA"
+      },
+      "emergencyContact": {
+        "name": "Mike Johnson",
+        "relationship": "Spouse",
+        "phone": "+1-555-0104"
+      },
+      "skills": [
+        "Product Management",
+        "Agile",
+        "User Research",
+        "Data Analysis"
+      ],
+      "certifications": ["Certified Scrum Master", "PMP"],
+      "performanceRating": 4.8,
+      "lastReviewDate": "2024-02-01"
+    },
+    {
+      "id": "3",
+      "firstName": "Michael",
+      "lastName": "Brown",
+      "email": "michael.brown@globalindustries.com",
+      "phone": "+1-555-0105",
+      "dateOfBirth": "1988-11-10",
+      "hireDate": "2024-02-20",
+      "position": "Operations Manager",
+      "department": "Operations",
+      "companyId": "2",
+      "managerId": null,
+      "salary": 85000,
+      "status": "active",
+      "avatar": "/avatars/michael-brown.jpg",
+      "address": {
+        "street": "789 Pine Street",
+        "city": "New York",
+        "state": "NY",
+        "zipCode": "10001",
+        "country": "USA"
+      },
+      "emergencyContact": {
+        "name": "Lisa Brown",
+        "relationship": "Spouse",
+        "phone": "+1-555-0106"
+      },
+      "skills": [
+        "Operations Management",
+        "Supply Chain",
+        "Process Improvement",
+        "Leadership"
+      ],
+      "certifications": ["Six Sigma Black Belt", "Lean Management"],
+      "performanceRating": 4.2,
+      "lastReviewDate": "2024-02-20"
+    },
+    {
+      "id": "4",
+      "firstName": "Emily",
+      "lastName": "Davis",
+      "email": "emily.davis@startupventures.com",
+      "phone": "+1-555-0107",
+      "dateOfBirth": "1992-05-18",
+      "hireDate": "2024-03-10",
+      "position": "UX Designer",
+      "department": "Design",
+      "companyId": "3",
+      "managerId": null,
+      "salary": 75000,
+      "status": "active",
+      "avatar": "/avatars/emily-davis.jpg",
+      "address": {
+        "street": "321 Elm Street",
+        "city": "Austin",
+        "state": "TX",
+        "zipCode": "78701",
+        "country": "USA"
+      },
+      "emergencyContact": {
+        "name": "David Davis",
+        "relationship": "Spouse",
+        "phone": "+1-555-0108"
+      },
+      "skills": ["UI/UX Design", "Figma", "Prototyping", "User Research"],
+      "certifications": ["Google UX Design Certificate"],
+      "performanceRating": 4.6,
+      "lastReviewDate": "2024-03-10"
+    },
+    {
+      "id": "5",
+      "firstName": "David",
+      "lastName": "Wilson",
+      "email": "david.wilson@healthcaresystems.com",
+      "phone": "+1-555-0109",
+      "dateOfBirth": "1983-09-30",
+      "hireDate": "2024-01-05",
+      "position": "Chief Medical Officer",
+      "department": "Medical",
+      "companyId": "4",
+      "managerId": null,
+      "salary": 180000,
+      "status": "active",
+      "avatar": "/avatars/david-wilson.jpg",
+      "address": {
+        "street": "654 Maple Avenue",
+        "city": "Boston",
+        "state": "MA",
+        "zipCode": "02115",
+        "country": "USA"
+      },
+      "emergencyContact": {
+        "name": "Rachel Wilson",
+        "relationship": "Spouse",
+        "phone": "+1-555-0110"
+      },
+      "skills": [
+        "Medical Administration",
+        "Healthcare Policy",
+        "Clinical Leadership",
+        "Quality Assurance"
+      ],
+      "certifications": ["Board Certified", "Medical License"],
+      "performanceRating": 4.9,
+      "lastReviewDate": "2024-01-05"
+    },
+    {
+      "id": "6",
+      "firstName": "Lisa",
+      "lastName": "Anderson",
+      "email": "lisa.anderson@financialservices.com",
+      "phone": "+1-555-0111",
+      "dateOfBirth": "1987-12-05",
+      "hireDate": "2024-02-01",
+      "position": "Financial Analyst",
+      "department": "Finance",
+      "companyId": "5",
+      "managerId": null,
+      "salary": 90000,
+      "status": "active",
+      "avatar": "/avatars/lisa-anderson.jpg",
+      "address": {
+        "street": "987 Cedar Lane",
+        "city": "New York",
+        "state": "NY",
+        "zipCode": "10005",
+        "country": "USA"
+      },
+      "emergencyContact": {
+        "name": "Tom Anderson",
+        "relationship": "Spouse",
+        "phone": "+1-555-0112"
+      },
+      "skills": [
+        "Financial Analysis",
+        "Excel",
+        "Financial Modeling",
+        "Risk Assessment"
+      ],
+      "certifications": ["CFA Level 1", "CPA"],
+      "performanceRating": 4.4,
+      "lastReviewDate": "2024-02-01"
+    },
+    {
+      "id": "7",
+      "firstName": "Robert",
+      "lastName": "Taylor",
+      "email": "robert.taylor@retailsolutions.com",
+      "phone": "+1-555-0113",
+      "dateOfBirth": "1991-04-12",
+      "hireDate": "2024-03-15",
+      "position": "Sales Representative",
+      "department": "Sales",
+      "companyId": "6",
+      "managerId": null,
+      "salary": 65000,
+      "status": "active",
+      "avatar": "/avatars/robert-taylor.jpg",
+      "address": {
+        "street": "147 Birch Street",
+        "city": "Chicago",
+        "state": "IL",
+        "zipCode": "60601",
+        "country": "USA"
+      },
+      "emergencyContact": {
+        "name": "Amy Taylor",
+        "relationship": "Spouse",
+        "phone": "+1-555-0114"
+      },
+      "skills": [
+        "Sales",
+        "Customer Relationship Management",
+        "Negotiation",
+        "Product Knowledge"
+      ],
+      "certifications": ["Sales Certification"],
+      "performanceRating": 4.1,
+      "lastReviewDate": "2024-03-15"
+    },
+    {
+      "id": "8",
+      "firstName": "Jennifer",
+      "lastName": "Martinez",
+      "email": "jennifer.martinez@educationfirst.com",
+      "phone": "+1-555-0115",
+      "dateOfBirth": "1989-08-25",
+      "hireDate": "2024-01-20",
+      "position": "Curriculum Developer",
+      "department": "Education",
+      "companyId": "7",
+      "managerId": null,
+      "salary": 70000,
+      "status": "active",
+      "avatar": "/avatars/jennifer-martinez.jpg",
+      "address": {
+        "street": "258 Spruce Avenue",
+        "city": "Seattle",
+        "state": "WA",
+        "zipCode": "98101",
+        "country": "USA"
+      },
+      "emergencyContact": {
+        "name": "Carlos Martinez",
+        "relationship": "Spouse",
+        "phone": "+1-555-0116"
+      },
+      "skills": [
+        "Curriculum Development",
+        "Educational Technology",
+        "Instructional Design",
+        "Assessment"
+      ],
+      "certifications": ["Teaching License", "EdTech Certificate"],
+      "performanceRating": 4.7,
+      "lastReviewDate": "2024-01-20"
+    },
+    {
+      "id": "9",
+      "firstName": "Christopher",
+      "lastName": "Garcia",
+      "email": "christopher.garcia@greenenergy.com",
+      "phone": "+1-555-0117",
+      "dateOfBirth": "1986-01-08",
+      "hireDate": "2024-02-10",
+      "position": "Environmental Engineer",
+      "department": "Engineering",
+      "companyId": "8",
+      "managerId": null,
+      "salary": 95000,
+      "status": "active",
+      "avatar": "/avatars/christopher-garcia.jpg",
+      "address": {
+        "street": "369 Willow Street",
+        "city": "Denver",
+        "state": "CO",
+        "zipCode": "80201",
+        "country": "USA"
+      },
+      "emergencyContact": {
+        "name": "Maria Garcia",
+        "relationship": "Spouse",
+        "phone": "+1-555-0118"
+      },
+      "skills": [
+        "Environmental Engineering",
+        "Renewable Energy",
+        "Sustainability",
+        "Project Management"
+      ],
+      "certifications": ["Professional Engineer", "LEED Certification"],
+      "performanceRating": 4.3,
+      "lastReviewDate": "2024-02-10"
+    },
+    {
+      "id": "10",
+      "firstName": "Amanda",
+      "lastName": "Rodriguez",
+      "email": "amanda.rodriguez@techcorp.com",
+      "phone": "+1-555-0119",
+      "dateOfBirth": "1993-06-14",
+      "hireDate": "2024-01-25",
+      "position": "Marketing Specialist",
+      "department": "Marketing",
+      "companyId": "1",
+      "managerId": "2",
+      "salary": 70000,
+      "status": "active",
+      "avatar": "/avatars/amanda-rodriguez.jpg",
+      "address": {
+        "street": "741 Aspen Street",
+        "city": "San Francisco",
+        "state": "CA",
+        "zipCode": "94104",
+        "country": "USA"
+      },
+      "emergencyContact": {
+        "name": "Jose Rodriguez",
+        "relationship": "Spouse",
+        "phone": "+1-555-0120"
+      },
+      "skills": [
+        "Digital Marketing",
+        "Social Media",
+        "Content Creation",
+        "Analytics"
+      ],
+      "certifications": ["Google Ads Certification", "HubSpot Certification"],
+      "performanceRating": 4.0,
+      "lastReviewDate": "2024-01-25"
+    }
+  ]
+}
