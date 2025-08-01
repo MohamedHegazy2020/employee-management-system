@@ -228,77 +228,85 @@
       </template>
       <template #content>
         <div class="p-4">
-          <DataTable
-            :value="topCompanies"
-            class="custom-datatable"
-            :paginator="false"
-            :rows="5"
-            striped-rows
-            show-gridlines
-            responsive-layout="scroll"
+          <BaseTable
+            :data="topCompanies"
+            :columns="companyTableColumns"
+            :loading="false"
+            :show-paginator="false"
+            :show-header="false"
+            :show-search="false"
+            title=""
+            description=""
+            class="shadow-sm border border-gray-200/50"
           >
-            <Column field="name" header="Company" sortable>
-              <template #body="{ data }">
-                <div class="flex items-center space-x-3">
-                  <div
-                    class="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center"
-                  >
-                    <i class="pi pi-building text-white text-sm"></i>
-                  </div>
-                  <div>
-                    <p class="font-semibold text-gray-900">{{ data.name }}</p>
-                    <p class="text-sm text-gray-500">{{ data.code }}</p>
-                  </div>
-                </div>
-              </template>
-            </Column>
-            <Column field="email" header="Contact" sortable>
-              <template #body="{ data }">
-                <div>
-                  <p class="text-sm font-medium text-gray-900">
-                    {{ data.email }}
-                  </p>
-                  <p class="text-sm text-gray-500">{{ data.phone }}</p>
-                </div>
-              </template>
-            </Column>
-            <Column field="employeeCount" header="Employees" sortable>
-              <template #body="{ data }">
-                <span
-                  class="bg-blue-100 text-blue-800 text-sm font-semibold px-2 py-1 rounded-full"
+            <!-- Custom Company Column -->
+            <template #body-name="{ data }">
+              <div v-if="data" class="flex items-center space-x-3">
+                <div
+                  class="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center"
                 >
-                  {{ data.employeeCount }}
-                </span>
-              </template>
-            </Column>
-            <Column field="status" header="Status" sortable>
-              <template #body="{ data }">
-                <Tag value="Active" severity="success" class="font-bold" />
-              </template>
-            </Column>
-            <Column header="Actions" class="text-center font-semibold">
-              <template #body="{ data }">
-                <div class="flex items-center justify-center space-x-2">
-                  <BaseButton
-                    icon="pi pi-eye"
-                    variant="info"
-                    size="small"
-                    padding="compact"
-                    rounded
-                    @click="$router.push(`/companies/${data.id}`)"
-                  />
-                  <BaseButton
-                    icon="pi pi-pencil"
-                    variant="success"
-                    size="small"
-                    padding="compact"
-                    rounded
-                    @click="$router.push(`/companies/${data.id}/edit`)"
-                  />
+                  <i class="pi pi-building text-white text-sm"></i>
                 </div>
-              </template>
-            </Column>
-          </DataTable>
+                <div>
+                  <p class="font-semibold text-gray-900">{{ data.name }}</p>
+                  <p class="text-sm text-gray-500">{{ data.code }}</p>
+                </div>
+              </div>
+            </template>
+
+            <!-- Custom Contact Column -->
+            <template #body-email="{ data }">
+              <div v-if="data">
+                <p class="text-sm font-medium text-gray-900">
+                  {{ data.email }}
+                </p>
+                <p class="text-sm text-gray-500">{{ data.phone }}</p>
+              </div>
+            </template>
+
+            <!-- Custom Employees Column -->
+            <template #body-employeeCount="{ data }">
+              <span
+                v-if="data"
+                class="bg-blue-100 text-blue-800 text-sm font-semibold px-2 py-1 rounded-full"
+              >
+                {{ data.employeeCount }}
+              </span>
+            </template>
+
+            <!-- Custom Status Column -->
+            <template #body-status="{ data }">
+              <Tag
+                v-if="data"
+                value="Active"
+                severity="success"
+                class="font-bold"
+              />
+            </template>
+
+            <!-- Custom Row Actions -->
+            <template #row-actions="{ data }">
+              <div
+                v-if="data"
+                class="flex items-center justify-center space-x-2"
+              >
+                <BaseButton
+                  icon="pi pi-eye"
+                  variant="info"
+                  size="small"
+                  padding="compact"
+                  @click="$router.push(`/companies/${data.id}`)"
+                />
+                <BaseButton
+                  icon="pi pi-pencil"
+                  variant="success"
+                  size="small"
+                  padding="compact"
+                  @click="$router.push(`/companies/${data.id}/edit`)"
+                />
+              </div>
+            </template>
+          </BaseTable>
         </div>
       </template>
     </Card>
@@ -311,8 +319,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useCompaniesStore } from "@/stores/companies";
 import Card from "primevue/card";
 import { BaseButton } from "@/components/ui";
-import DataTable from "primevue/datatable";
-import Column from "primevue/column";
+import { BaseTable } from "@/components/ui";
 import Tag from "primevue/tag";
 
 const authStore = useAuthStore();
@@ -354,6 +361,14 @@ const recentActivity = ref([
 
 const topCompanies = ref([]);
 
+const companyTableColumns = ref([
+  { field: "name", header: "Company", sortable: true },
+  { field: "email", header: "Contact", sortable: true },
+  { field: "employeeCount", header: "Employees", sortable: true },
+  { field: "status", header: "Status", sortable: true },
+  { field: "row-actions", header: "Actions", class: "text-center font-semibold" },
+]);
+
 onMounted(async () => {
   await companiesStore.fetchCompanies();
 
@@ -375,40 +390,5 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.custom-datatable {
-  border-radius: 0.75rem;
-  overflow: hidden;
-}
 
-.custom-datatable :deep(.p-datatable-header) {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-}
-
-.custom-datatable :deep(.p-datatable-thead > tr > th) {
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  border: none;
-  font-weight: 600;
-  color: #374151;
-  padding: 1rem;
-}
-
-.custom-datatable :deep(.p-datatable-tbody > tr) {
-  transition: all 0.2s ease;
-}
-
-.custom-datatable :deep(.p-datatable-tbody > tr:hover) {
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.custom-datatable :deep(.p-datatable-tbody > tr:nth-child(even)) {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-}
-
-.custom-datatable :deep(.p-datatable-tbody > tr:nth-child(even):hover) {
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-}
 </style>

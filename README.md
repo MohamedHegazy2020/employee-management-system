@@ -1,65 +1,80 @@
-# 🏢 Employee Management System
+# Employee Management System
 
-A modern, responsive Employee Management System built with Vue 3, TypeScript, and PrimeVue. This application provides comprehensive tools for managing companies, departments, employees, and organizational hierarchies.
+A modern, comprehensive employee management system built with Vue 3, TypeScript, and PrimeVue. This application provides a complete solution for managing companies, departments, and employees with a beautiful, responsive interface.
 
-## ✨ Features
+## 🚀 Features
 
-### 🔐 Authentication & User Management
+### Core Functionality
 
-- **Secure Login/Logout** with session management
-- **Forgot Password** functionality
-- **Role-based Access Control** (Admin, Manager, Employee)
-- **User Profile Management**
-- **Token-based Authentication** with localStorage persistence
+- **Company Management**: Create, edit, view, and delete companies with hierarchical relationships
+- **Department Management**: Organize departments within companies with budget tracking
+- **Employee Management**: Complete employee profiles with skills, certifications, and performance tracking
+- **User Authentication**: Secure login/logout with role-based access control
 
-### 🏢 Company Management
+### Advanced Features
 
-- **Complete CRUD Operations** for companies
-- **Hierarchical Company Structure** with parent-child relationships
-- **Advanced Search & Filtering** by name, code, or email
-- **Tree View** for visualizing company hierarchy
-- **Bulk Export** to CSV format
-- **Pagination** for large datasets
+- **Grid & Table Views**: Toggle between grid and table views for better data visualization
+- **Advanced Filtering**: Filter data by company, department, status, and other criteria
+- **Search Functionality**: Global search across all entities
+- **Pagination**: Efficient data pagination with customizable page sizes
+- **Export Capabilities**: Export data in various formats
+- **Responsive Design**: Mobile-friendly interface that works on all devices
 
-### 📊 Dashboard & Analytics
+### UI/UX Features
 
-- **Real-time Statistics** (companies, departments, employees, projects)
-- **Recent Activity Feed**
-- **Quick Action Buttons**
-- **Company Overview Table**
-- **Responsive Design** for all devices
+- **Modern Design**: Clean, professional interface with smooth animations
+- **Dark/Light Themes**: Customizable theme support
+- **Interactive Components**: Rich form components with validation
+- **Real-time Updates**: Live data updates and notifications
+- **Accessibility**: WCAG compliant components
 
-### 🎨 Modern UI/UX
-
-- **PrimeVue Components** for professional look and feel
-- **Tailwind CSS** for custom styling
-- **Responsive Design** - mobile-first approach
-- **Dark/Light Theme Ready**
-- **Loading States** and error handling
-- **Form Validation** with Vuelidate
-
-## 🛠️ Tech Stack
+## 🛠️ Technology Stack
 
 ### Frontend
 
-- **Vue 3** - Progressive JavaScript framework
-- **TypeScript** - Type-safe JavaScript
-- **Vite** - Fast build tool and dev server
-- **Vue Router 4** - Official router for Vue.js
-- **Pinia** - State management for Vue
+- **Vue 3**: Progressive JavaScript framework with Composition API
+- **TypeScript**: Type-safe JavaScript development
+- **PrimeVue**: Rich UI component library
+- **Tailwind CSS**: Utility-first CSS framework
+- **Vite**: Fast build tool and development server
 
-### UI & Styling
+### State Management
 
-- **PrimeVue 4** - Rich UI component library
-- **Tailwind CSS 3** - Utility-first CSS framework
-- **PrimeIcons** - Icon library
-- **Vuelidate** - Form validation
+- **Pinia**: Modern state management for Vue 3
+- **Vue Router**: Official router for Vue.js
 
 ### Development Tools
 
-- **ESLint** - Code linting
-- **TypeScript** - Static type checking
-- **Vite** - Build tool and development server
+- **ESLint**: Code linting and formatting
+- **Prettier**: Code formatting
+- **PostCSS**: CSS processing
+
+## 📁 Project Structure
+
+```
+employee-management-system/
+├── src/
+│   ├── components/
+│   │   └── ui/                    # Reusable UI components
+│   │       ├── BaseInput.vue      # Form input component
+│   │       ├── BaseButton.vue     # Button component
+│   │       ├── BaseTable.vue      # Data table component
+│   │       ├── BaseGridView.vue   # Grid view component
+│   │       ├── dropdown/          # Dropdown components
+│   │       ├── table/             # Table components
+│   │       └── grid/              # Grid components
+│   ├── views/
+│   │   ├── auth/                  # Authentication views
+│   │   ├── companies/             # Company management views
+│   │   ├── departments/           # Department management views
+│   │   └── employees/             # Employee management views
+│   ├── stores/                    # Pinia stores
+│   ├── data/                      # JSON data files
+│   ├── router/                    # Vue Router configuration
+│   └── layouts/                   # Application layouts
+├── public/                        # Static assets
+└── docs/                          # Documentation
+```
 
 ## 🚀 Getting Started
 
@@ -83,7 +98,7 @@ A modern, responsive Employee Management System built with Vue 3, TypeScript, an
    npm install
    ```
 
-3. **Start the development server**
+3. **Start development server**
 
    ```bash
    npm run dev
@@ -92,113 +107,119 @@ A modern, responsive Employee Management System built with Vue 3, TypeScript, an
 4. **Open your browser**
    Navigate to `http://localhost:5173`
 
-### Login Credentials
-
-Use these demo credentials to access the system:
-
-- **Email:** `admin@example.com`
-- **Password:** `password`
-
-## 📁 Project Structure
-
-```
-src/
-├── components/          # Reusable Vue components
-│   └── companies/      # Company-specific components
-├── layouts/            # Layout components
-├── router/             # Vue Router configuration
-├── stores/             # Pinia state management
-│   ├── auth.ts        # Authentication store
-│   └── companies.ts   # Companies data store
-├── views/              # Page components
-│   ├── auth/          # Authentication pages
-│   ├── companies/     # Company management pages
-│   ├── departments/   # Department management pages
-│   └── employees/     # Employee management pages
-├── style.css          # Global styles and Tailwind
-├── main.ts            # Application entry point
-└── App.vue            # Root component
-```
-
-## 🎯 Key Features Explained
-
-### Company Hierarchy Management
-
-- **Tree View**: Visual representation of parent-child company relationships
-- **Drag & Drop**: Reorganize company structure (planned)
-- **Bulk Operations**: Export, delete, or modify multiple companies
-
-### Advanced Search & Filtering
-
-- **Real-time Search**: Instant results as you type
-- **Multi-field Search**: Search by name, code, email, or phone
-- **Pagination**: Handle large datasets efficiently
-
-### Responsive Design
-
-- **Mobile-First**: Optimized for mobile devices
-- **Tablet Support**: Responsive layout for tablets
-- **Desktop Experience**: Full-featured desktop interface
-
-## 🔧 Development
-
-### Available Scripts
+### Build for Production
 
 ```bash
-# Development server
-npm run dev
-
-# Build for production
 npm run build
-
-# Preview production build
-npm run preview
-
-# Lint code
-npm run lint
-
-# Type checking
-npm run type-check
 ```
 
-### Code Style
+### Preview Production Build
 
-- **ESLint** configuration for consistent code style
-- **TypeScript** for type safety
-- **Vue 3 Composition API** for modern Vue development
+```bash
+npm run preview
+```
 
-## 🎨 Customization
+## 📖 Usage
 
-### Styling
+### Authentication
 
-The project uses Tailwind CSS for styling. You can customize:
+- **Default Credentials**:
+  - Email: `admin@example.com`
+  - Password: `admin123`
 
-- **Colors**: Modify the color palette in `tailwind.config.js`
-- **Components**: Use PrimeVue theming or create custom components
-- **Layout**: Adjust the responsive breakpoints and grid system
+### Company Management
 
-### Adding New Features
+1. Navigate to Companies section
+2. View all companies in table or grid format
+3. Create new companies with complete information
+4. Edit existing companies
+5. View detailed company information
+6. Delete companies (with confirmation)
 
-1. **Create new stores** in `src/stores/` for state management
-2. **Add new routes** in `src/router/index.ts`
-3. **Create new views** in `src/views/`
-4. **Build reusable components** in `src/components/`
+### Department Management
 
-## 🔒 Security Features
+1. Navigate to Departments section
+2. Create departments within companies
+3. Assign managers and budgets
+4. Track employee counts
+5. Manage department settings
 
-- **JWT Token Management** with automatic refresh
-- **Route Guards** for protected pages
-- **Role-based Navigation** showing only relevant menu items
-- **Form Validation** preventing invalid data submission
+### Employee Management
 
-## 📱 Browser Support
+1. Navigate to Employees section
+2. Create employee profiles with complete information
+3. Assign employees to companies and departments
+4. Track skills and certifications
+5. Monitor performance metrics
+6. Manage employee status and information
 
-- **Chrome** (latest)
-- **Firefox** (latest)
-- **Safari** (latest)
-- **Edge** (latest)
+## 🎨 UI Components
 
-## 🤝 Contributing
+### Base Components
+
+- **BaseInput**: Enhanced input field with validation and styling
+- **BaseButton**: Customizable button with multiple variants
+- **BaseDropdown**: Advanced dropdown with filtering
+- **BaseTable**: Feature-rich data table with pagination
+- **BaseGridView**: Responsive grid view for data display
+- **BaseForm**: Form wrapper with validation and actions
+
+### Features
+
+- **Float Labels**: Modern input styling with animated labels
+- **Validation**: Real-time form validation with error messages
+- **Responsive Design**: Mobile-first responsive layouts
+- **Accessibility**: WCAG compliant components
+- **Customization**: Extensive customization options
+
+## 📊 Data Management
+
+### JSON Data Structure
+
+- **companies.json**: Company data with hierarchical relationships
+- **departments.json**: Department data with budget and location info
+- **employees.json**: Employee data with skills and performance metrics
+- **users.json**: User authentication data
+
+### Store Management
+
+- **authStore**: User authentication and session management
+- **companiesStore**: Company data management
+- **departmentsStore**: Department data management
+- **employeesStore**: Employee data management
+
+## 🔧 Configuration
+
+### Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
+VITE_APP_TITLE=Employee Management System
+VITE_APP_API_URL=http://localhost:3000/api
+```
+
+### Customization
+
+- **Themes**: Customize colors and styling in `src/style.css`
+- **Components**: Modify component behavior in `src/components/ui/`
+- **Routing**: Update routes in `src/router/index.ts`
+
+## 🧪 Testing
+
+### Run Tests
+
+```bash
+npm run test
+```
+
+### Run Tests with Coverage
+
+```bash
+npm run test:coverage
+```
+
+## 📝 Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -206,47 +227,52 @@ The project uses Tailwind CSS for styling. You can customize:
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
+### Development Guidelines
+
+- Follow Vue 3 Composition API patterns
+- Use TypeScript for type safety
+- Follow ESLint and Prettier configurations
+- Write meaningful commit messages
+- Add tests for new features
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
+## 🤝 Support
 
-If you encounter any issues or have questions:
+For support and questions:
 
-1. Check the [Issues](../../issues) page for existing solutions
-2. Create a new issue with detailed information
-3. Contact the development team
+- Create an issue in the repository
+- Check the documentation in `/docs`
+- Review the component examples
 
-## 🚀 Deployment
+## 🗺️ Roadmap
 
-### Build for Production
+### Planned Features
 
-```bash
-npm run build
-```
+- [ ] Advanced reporting and analytics
+- [ ] Email notifications
+- [ ] File upload and management
+- [ ] Advanced search and filtering
+- [ ] Mobile application
+- [ ] API integration
+- [ ] Multi-language support
+- [ ] Advanced permissions system
 
-The built files will be in the `dist/` directory, ready for deployment to any static hosting service.
+### Performance Improvements
 
-### Environment Variables
+- [ ] Lazy loading for large datasets
+- [ ] Virtual scrolling for tables
+- [ ] Caching strategies
+- [ ] Bundle optimization
 
-Create a `.env` file in the root directory for environment-specific configuration:
+## 🙏 Acknowledgments
 
-```env
-VITE_API_BASE_URL=https://api.example.com
-VITE_APP_TITLE=Employee Management System
-```
-
-## 📈 Future Enhancements
-
-- [ ] **Employee Management** - Complete CRUD operations
-- [ ] **Department Management** - Organizational structure
-- [ ] **Real-time Notifications** - WebSocket integration
-- [ ] **Advanced Reporting** - Charts and analytics
-- [ ] **File Upload** - Profile pictures and documents
-- [ ] **Multi-language Support** - Internationalization
-- [ ] **Dark Mode** - Theme switching
-- [ ] **Offline Support** - Service worker implementation
+- **Vue.js Team** for the amazing framework
+- **PrimeVue Team** for the excellent UI components
+- **Tailwind CSS Team** for the utility-first CSS framework
+- **Vite Team** for the fast build tool
 
 ---
 
