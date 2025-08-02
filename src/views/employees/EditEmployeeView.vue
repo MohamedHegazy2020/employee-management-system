@@ -424,9 +424,8 @@
             <BaseButton
               label="Delete Employee"
               icon="pi pi-trash"
-              variant="danger"
+              variant="error"
               size="medium"
-              padding="normal"
               @click="confirmDelete"
             />
           </div>

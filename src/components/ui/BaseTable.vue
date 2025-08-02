@@ -149,7 +149,7 @@
                 <BaseButton
                   v-if="showEditAction"
                   icon="pi pi-pencil"
-                  variant="success"
+                  variant="primary"
                   size="small"
                   padding="compact"
                   @click="handleEdit(data)"
@@ -157,7 +157,7 @@
                 <BaseButton
                   v-if="showDeleteAction"
                   icon="pi pi-trash"
-                  variant="danger"
+                  variant="error"
                   size="small"
                   padding="compact"
                   @click="handleDelete(data)"

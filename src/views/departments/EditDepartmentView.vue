@@ -404,7 +404,7 @@
             <BaseButton
               label="Delete Department"
               icon="pi pi-trash"
-              variant="danger"
+              variant="error"
               size="medium"
               padding="normal"
               @click="confirmDelete"

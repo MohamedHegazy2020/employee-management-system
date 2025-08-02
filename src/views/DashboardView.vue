@@ -181,7 +181,7 @@
             <BaseButton
               label="Create Department"
               icon="pi pi-folder-plus"
-              variant="purple"
+              variant="info"
               size="medium"
               padding="comfortable"
               fullWidth
@@ -366,7 +366,11 @@ const companyTableColumns = ref([
   { field: "email", header: "Contact", sortable: true },
   { field: "employeeCount", header: "Employees", sortable: true },
   { field: "status", header: "Status", sortable: true },
-  { field: "row-actions", header: "Actions", class: "text-center font-semibold" },
+  {
+    field: "row-actions",
+    header: "Actions",
+    class: "text-center font-semibold",
+  },
 ]);
 
 onMounted(async () => {
@@ -389,6 +393,4 @@ onMounted(async () => {
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

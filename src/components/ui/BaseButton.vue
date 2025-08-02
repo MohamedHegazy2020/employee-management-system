@@ -94,13 +94,11 @@ const buttonClasses = computed(() => {
     success: "btn-success",
     warning: "btn-warning",
     error: "btn-error",
-    info: "bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md hover:shadow-lg",
-    light:
-      "bg-white text-gray-700 border border-gray-300 shadow-sm hover:shadow-md hover:bg-gray-50",
-    dark: "bg-gradient-to-r from-gray-700 to-gray-800 text-white shadow-md hover:shadow-lg",
-    outline:
-      "bg-transparent border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white",
-    ghost: "bg-transparent text-gray-700 hover:bg-gray-100 hover:text-gray-900",
+    info: "btn-info",
+    light: "btn-light",
+    dark: "btn-dark",
+    outline: "btn-outline",
+    ghost: "btn-ghost",
   };
 
   const stateClasses = {

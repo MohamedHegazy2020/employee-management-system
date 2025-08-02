@@ -228,7 +228,7 @@
           />
           <BaseButton
             icon="pi pi-trash"
-            variant="danger"
+            variant="error"
             size="small"
             padding="compact"
             @click="handleDelete(data)"
@@ -350,7 +350,7 @@
         />
         <BaseButton
           icon="pi pi-trash"
-          variant="danger"
+          variant="error"
           size="xs"
           padding="compact"
           rounded

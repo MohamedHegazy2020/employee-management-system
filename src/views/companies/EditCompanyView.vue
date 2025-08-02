@@ -360,7 +360,7 @@
             <BaseButton
               label="Delete Company"
               icon="pi pi-trash"
-              variant="danger"
+              variant="error"
               size="medium"
               padding="normal"
               @click="confirmDelete"

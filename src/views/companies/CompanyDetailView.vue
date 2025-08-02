@@ -24,44 +24,166 @@
     </div>
 
     <!-- Company Details -->
-    <div v-else-if="company">
-      <!-- Header -->
-      <div class="flex items-center justify-between">
-        <div>
-          <nav class="flex items-center space-x-2 text-sm text-gray-500 mb-2">
-            <router-link
-              to="/companies"
-              class="hover:text-blue-600 transition-colors"
-            >
-              Companies
-            </router-link>
-            <i class="pi pi-chevron-right text-xs"></i>
-            <span class="text-gray-900 font-medium">{{ company.name }}</span>
-          </nav>
-          <h1 class="text-3xl font-bold text-gray-900">{{ company.name }}</h1>
-          <p class="mt-1 text-sm text-gray-600">
-            Company Code: {{ company.code }} | Industry: {{ company.industry }}
-          </p>
+    <div v-else-if="company" class="space-y-8">
+      <!-- Company Header Card -->
+      <div class="detail-card">
+        <div class="detail-header">
+          <div class="flex items-center space-x-6">
+            <!-- Company Logo -->
+            <div class="flex-shrink-0">
+              <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                <i class="pi pi-building text-white text-3xl"></i>
+              </div>
+            </div>
+
+            <!-- Company Info -->
+            <div class="flex-1">
+              <div class="flex items-center space-x-3 mb-2">
+                <h2 class="text-2xl font-bold text-gray-900">{{ company.name }}</h2>
+                <Tag
+                  :value="company.status"
+                  :severity="getStatusSeverity(company.status)"
+                  class="text-xs font-semibold"
+                />
+              </div>
+              <p class="text-lg text-gray-600 mb-1">{{ company.industry }}</p>
+              <p class="text-sm text-gray-500">{{ company.size }} Company</p>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex items-center space-x-3">
+            <BaseButton
+              label="Back to List"
+              icon="pi pi-arrow-left"
+              variant="secondary"
+              size="medium"
+              @click="$router.push('/companies')"
+            />
+            <BaseButton
+              label="Edit Company"
+              icon="pi pi-pencil"
+              variant="primary"
+              size="medium"
+              @click="$router.push(`/companies/${companyId}/edit`)"
+            />
+          </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="flex items-center space-x-3">
-          <BaseButton
-            label="Back to List"
-            icon="pi pi-arrow-left"
-            variant="secondary"
-            size="medium"
-            padding="normal"
-            @click="$router.push('/companies')"
-          />
-          <BaseButton
-            label="Edit Company"
-            icon="pi pi-pencil"
-            variant="primary"
-            size="medium"
-            padding="normal"
-            @click="$router.push(`/companies/${company.id}/edit`)"
-          />
+        <div class="detail-content">
+          <!-- Company Statistics -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-blue-600">Employees</p>
+                  <p class="text-2xl font-bold text-blue-900">{{ company.employeeCount }}</p>
+                </div>
+                <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+                  <i class="pi pi-users text-white text-xl"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-green-600">Departments</p>
+                  <p class="text-2xl font-bold text-green-900">{{ company.departmentCount }}</p>
+                </div>
+                <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center">
+                  <i class="pi pi-sitemap text-white text-xl"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-purple-600">Founded</p>
+                  <p class="text-2xl font-bold text-purple-900">{{ company.foundedYear || 'N/A' }}</p>
+                </div>
+                <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
+                  <i class="pi pi-calendar text-white text-xl"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-6 border border-orange-200">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-orange-600">Revenue</p>
+                  <p class="text-2xl font-bold text-orange-900">{{ formatCurrency(company.annualRevenue) }}</p>
+                </div>
+                <div class="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center">
+                  <i class="pi pi-dollar text-white text-xl"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Information -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+              <h3 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
+                <i class="pi pi-envelope text-blue-600 mr-2"></i>
+                Contact Information
+              </h3>
+              
+              <div class="space-y-3">
+                <div class="flex items-center space-x-3">
+                  <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <i class="pi pi-envelope text-blue-600 text-sm"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Email</p>
+                    <p class="text-gray-900">{{ company.email }}</p>
+                  </div>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                  <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                    <i class="pi pi-phone text-green-600 text-sm"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Phone</p>
+                    <p class="text-gray-900">{{ company.phone }}</p>
+                  </div>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                  <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <i class="pi pi-globe text-purple-600 text-sm"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Website</p>
+                    <a :href="company.website" target="_blank" class="text-blue-600 hover:text-blue-800">
+                      {{ company.website || 'N/A' }}
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <h3 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
+                <i class="pi pi-map-marker text-orange-600 mr-2"></i>
+                Address
+              </h3>
+              
+              <div class="space-y-3">
+                <div class="flex items-start space-x-3">
+                  <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center mt-1">
+                    <i class="pi pi-map-marker text-orange-600 text-sm"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Address</p>
+                    <p class="text-gray-900">{{ company.address }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

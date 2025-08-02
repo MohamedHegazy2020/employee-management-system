@@ -68,11 +68,11 @@
     </div>
 
     <!-- Employee Details -->
-    <div v-else-if="employee" class="space-y-6">
+    <div v-else-if="employee" class="space-y-8">
       <!-- Employee Header Card -->
-      <Card class="employee-header-card">
-        <template #content>
-          <div class="flex items-start space-x-6">
+      <div class="detail-card">
+        <div class="detail-header">
+          <div class="flex items-center space-x-6">
             <!-- Employee Avatar -->
             <div class="flex-shrink-0">
               <Avatar
@@ -98,65 +98,114 @@
                 <Tag
                   :value="employee.status"
                   :severity="getStatusSeverity(employee.status)"
-                  class="capitalize"
+                  class="text-xs font-semibold"
                 />
               </div>
+              <p class="text-lg text-gray-600 mb-1">{{ employee.position }}</p>
+              <p class="text-sm text-gray-500">
+                {{ employee.department }} • {{ employee.company }}
+              </p>
+            </div>
+          </div>
 
+          <!-- Action Buttons -->
+          <div class="flex items-center space-x-3">
+            <BaseButton
+              label="Back to List"
+              icon="pi pi-arrow-left"
+              variant="secondary"
+              size="medium"
+              @click="$router.push('/employees')"
+            />
+            <BaseButton
+              label="Edit Employee"
+              icon="pi pi-pencil"
+              variant="primary"
+              size="medium"
+              @click="$router.push(`/employees/${employeeId}/edit`)"
+            />
+          </div>
+        </div>
+
+        <div class="detail-content">
+          <!-- Contact Information -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="flex items-center space-x-3">
               <div
-                class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600"
+                class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center"
               >
-                <div class="flex items-center">
-                  <i class="pi pi-envelope text-gray-400 mr-2"></i>
-                  <a
-                    :href="`mailto:${employee.email}`"
-                    class="hover:text-blue-600 transition-colors"
-                  >
-                    {{ employee.email }}
-                  </a>
-                </div>
-                <div class="flex items-center">
-                  <i class="pi pi-phone text-gray-400 mr-2"></i>
-                  <a
-                    :href="`tel:${employee.phone}`"
-                    class="hover:text-blue-600 transition-colors"
-                  >
-                    {{ employee.phone }}
-                  </a>
-                </div>
-                <div class="flex items-center">
-                  <i class="pi pi-briefcase text-gray-400 mr-2"></i>
-                  <span>{{ employee.position }}</span>
-                </div>
-                <div class="flex items-center">
-                  <i class="pi pi-building text-gray-400 mr-2"></i>
-                  <span>{{ getCompanyName(employee.companyId) }}</span>
-                </div>
+                <i class="pi pi-envelope text-blue-600"></i>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-500">Email</p>
+                <p class="text-gray-900">{{ employee.email }}</p>
               </div>
             </div>
 
-            <!-- Performance Rating -->
-            <div class="flex-shrink-0">
-              <div class="text-center">
-                <div class="text-2xl font-bold text-gray-900 mb-1">
-                  {{ employee.performanceRating }}/5
-                </div>
-                <div class="flex items-center justify-center mb-2">
-                  <div class="w-20 bg-gray-200 rounded-full h-2">
-                    <div
-                      class="h-2 rounded-full transition-all duration-300"
-                      :class="getPerformanceColor(employee.performanceRating)"
-                      :style="{
-                        width: `${(employee.performanceRating / 5) * 100}%`,
-                      }"
-                    ></div>
-                  </div>
-                </div>
-                <div class="text-sm text-gray-600">Performance Rating</div>
+            <div class="flex items-center space-x-3">
+              <div
+                class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center"
+              >
+                <i class="pi pi-phone text-green-600"></i>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-500">Phone</p>
+                <p class="text-gray-900">{{ employee.phone }}</p>
+              </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+              <div
+                class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center"
+              >
+                <i class="pi pi-calendar text-purple-600"></i>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-500">Hire Date</p>
+                <p class="text-gray-900">{{ formatDate(employee.hireDate) }}</p>
+              </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+              <div
+                class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center"
+              >
+                <i class="pi pi-dollar text-orange-600"></i>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-500">Salary</p>
+                <p class="text-gray-900">
+                  {{ formatCurrency(employee.salary) }}
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+              <div
+                class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center"
+              >
+                <i class="pi pi-star text-indigo-600"></i>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-500">Performance</p>
+                <p class="text-gray-900">{{ employee.performanceRating }}/5</p>
+              </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+              <div
+                class="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center"
+              >
+                <i class="pi pi-briefcase text-teal-600"></i>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-500">Employment Type</p>
+                <p class="text-gray-900">{{ employee.employmentType }}</p>
               </div>
             </div>
           </div>
-        </template>
-      </Card>
+        </div>
+      </div>
 
       <!-- Stats Cards -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6">

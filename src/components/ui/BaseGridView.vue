@@ -101,10 +101,9 @@
                         />
                         <BaseButton
                           icon="pi pi-trash"
-                          variant="danger"
-                          size="xs"
+                          variant="error"
+                          size="small"
                           padding="compact"
-                          rounded
                           @click="handleDelete(item)"
                         />
                       </slot>
