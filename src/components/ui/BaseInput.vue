@@ -11,7 +11,6 @@
         :id="id"
         v-model="inputValue"
         :type="type"
-        :placeholder="placeholder"
         :disabled="disabled"
         :class="inputClasses"
         :required="required"
@@ -65,21 +64,13 @@
     </div>
 
     <!-- Error Message -->
-    <div
-      v-if="error"
-      class="error-message"
-      role="alert"
-      aria-live="polite"
-    >
+    <div v-if="error" class="error-message" role="alert" aria-live="polite">
       <i class="pi pi-exclamation-triangle"></i>
       <span>{{ error }}</span>
     </div>
 
     <!-- Hint Message -->
-    <div
-      v-else-if="hint"
-      class="hint-message"
-    >
+    <div v-else-if="hint" class="hint-message">
       <i class="pi pi-info-circle"></i>
       <span>{{ hint }}</span>
     </div>
@@ -102,7 +93,6 @@ import InputText from "primevue/inputtext";
 interface Props {
   modelValue: string;
   label?: string;
-  placeholder?: string;
   type?: string;
   id?: string;
   icon?: string;
@@ -171,7 +161,9 @@ const inputClasses = computed(() => {
     stateClasses.focused,
     stateClasses.hasValue,
     stateClasses.hasIcon,
-  ].filter(Boolean).join(" ");
+  ]
+    .filter(Boolean)
+    .join(" ");
 });
 
 const handleInput = (event: Event) => {
@@ -206,7 +198,7 @@ const handleFocus = (event: Event) => {
 
 .input-icon {
   position: absolute;
-  left: 1rem;
+  right: 1rem;
   top: 50%;
   transform: translateY(-50%);
   z-index: 10;
@@ -224,7 +216,7 @@ const handleFocus = (event: Event) => {
   left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  background: white;
+  background: rgb(249 250 251);
   padding: 0 0.5rem;
   color: rgb(107 114 128);
   font-size: 0.875rem;
@@ -240,8 +232,8 @@ const handleFocus = (event: Event) => {
   transform: translateY(-50%) scale(0.85);
   color: rgb(59 130 246);
   font-weight: 600;
-  background: white;
-  box-shadow: 0 0 0 2px white;
+  background: rgb(249 250 251);
+  box-shadow: 0 0 0 2px rgb(249 250 251);
 }
 
 .floating-label-focused {
@@ -259,7 +251,7 @@ const handleFocus = (event: Event) => {
 
 .status-icons {
   position: absolute;
-  right: 1rem;
+  right: 4rem;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -347,7 +339,7 @@ const handleFocus = (event: Event) => {
   width: 100%;
   border: 2px solid rgb(229 231 235);
   border-radius: 0.75rem;
-  background: white;
+  background: rgb(249 250 251);
   color: rgb(17 24 39);
   font-size: 0.875rem;
   font-weight: 500;
@@ -411,18 +403,7 @@ const handleFocus = (event: Event) => {
 
 /* Icon Positioning */
 :deep(.input-has-icon) {
-  padding-left: 3rem;
-}
-
-/* Placeholder Styling */
-:deep(.modern-input::placeholder) {
-  color: rgb(156 163 175);
-  font-weight: 400;
-  transition: color 0.2s ease;
-}
-
-:deep(.modern-input:focus::placeholder) {
-  color: rgb(107 114 128);
+  padding-right: 3rem;
 }
 
 /* Type-specific Styling */
@@ -444,14 +425,26 @@ const handleFocus = (event: Event) => {
 
 /* Animations */
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-2px); }
-  75% { transform: translateX(2px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-2px);
+  }
+  75% {
+    transform: translateX(2px);
+  }
 }
 
 @keyframes bounce {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
 }
 
 @keyframes slideIn {
@@ -466,18 +459,18 @@ const handleFocus = (event: Event) => {
 }
 
 /* Focus state with icon */
-:deep(.input-has-icon:focus) + .input-icon {
+:deep(.input-has-icon:focus) ~ .input-icon {
   color: rgb(59 130 246);
   transform: translateY(-50%) scale(1.1);
 }
 
 /* Error state with icon */
-:deep(.input-error) + .input-icon {
+:deep(.input-error) ~ .input-icon {
   color: rgb(239 68 68);
 }
 
 /* Success state with icon */
-:deep(.input-has-value:not(.input-error)) + .input-icon {
+:deep(.input-has-value:not(.input-error)) ~ .input-icon {
   color: rgb(34 197 94);
 }
 
@@ -487,7 +480,7 @@ const handleFocus = (event: Event) => {
     padding: 0.875rem 1rem;
     font-size: 1rem;
   }
-  
+
   :deep(.input-large) {
     padding: 1rem 1.25rem;
     font-size: 1.125rem;
@@ -501,16 +494,12 @@ const handleFocus = (event: Event) => {
     border-color: rgb(75 85 99);
     color: rgb(243 244 246);
   }
-  
-  :deep(.modern-input::placeholder) {
-    color: rgb(156 163 175);
-  }
-  
+
   .floating-label {
     background: rgb(31 41 55);
     color: rgb(156 163 175);
   }
-  
+
   .floating-label-active {
     background: rgb(31 41 55);
     box-shadow: 0 0 0 2px rgb(31 41 55);

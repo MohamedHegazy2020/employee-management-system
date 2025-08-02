@@ -14,6 +14,3 @@ export { default as BasePagination } from "./BasePagination.vue";
 
 // Grid Components
 export { default as BaseGridView } from "./BaseGridView.vue";
-
-// Dropdown Components
-export { DropdownItem, DropdownPanel, DropdownFilter } from "./dropdown";

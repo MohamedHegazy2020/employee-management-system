@@ -46,8 +46,6 @@
           <BaseDropdown
             v-model="filters.companyId"
             :options="companyOptions"
-            option-label="name"
-            option-value="id"
             placeholder="Filter by Company"
             :show-clear="true"
             @change="handleFilterChange"
@@ -57,8 +55,6 @@
           <BaseDropdown
             v-model="filters.department"
             :options="departmentOptions"
-            option-label="label"
-            option-value="value"
             placeholder="Filter by Department"
             :show-clear="true"
             @change="handleFilterChange"
@@ -138,8 +134,7 @@
       <template #body-name="{ data }">
         <div v-if="data" class="flex items-center">
           <Avatar
-            :image="data.avatar"
-            :label="getInitials(data.firstName, data.lastName)"
+            v-bind="getAvatarProps(data.firstName, data.lastName, data.avatar)"
             size="normal"
             shape="circle"
             class="mr-3"
@@ -265,8 +260,9 @@
           <div class="flex items-start justify-between">
             <div class="flex items-center space-x-3">
               <Avatar
-                :image="item.avatar"
-                :label="getInitials(item.firstName, item.lastName)"
+                v-bind="
+                  getAvatarProps(item.firstName, item.lastName, item.avatar)
+                "
                 size="large"
                 shape="circle"
                 class="bg-gradient-to-br from-blue-400 to-blue-600 text-white text-lg font-bold"
@@ -433,21 +429,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, reactive, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useEmployeesStore } from "@/stores/employees";
 import { useCompaniesStore } from "@/stores/companies";
 import { useDepartmentsStore } from "@/stores/departments";
-import {
-  BaseTable,
-  BaseGridView,
-  BaseButton,
-  BaseInput,
-  BaseDropdown,
-} from "@/components/ui";
 import Card from "primevue/card";
 import Avatar from "primevue/avatar";
 import Tag from "primevue/tag";
+import {
+  BaseTable,
+  BaseButton,
+  BaseInput,
+  BaseDropdown,
+  BaseGridView,
+} from "@/components/ui";
+import { getAvatarProps } from "@/utils/avatar";
 
 const router = useRouter();
 const employeesStore = useEmployeesStore();
@@ -502,18 +499,25 @@ const statusOptions = computed(() => [
 
 // Statistics computed properties
 const activeEmployeesCount = computed(() => {
-  return employeesStore.employees.filter((emp) => emp.status === "active").length;
+  return employeesStore.employees.filter((emp) => emp.status === "active")
+    .length;
 });
 
 const averageSalary = computed(() => {
   if (employeesStore.employees.length === 0) return 0;
-  const total = employeesStore.employees.reduce((sum, emp) => sum + emp.salary, 0);
+  const total = employeesStore.employees.reduce(
+    (sum, emp) => sum + emp.salary,
+    0
+  );
   return Math.round(total / employeesStore.employees.length);
 });
 
 const averagePerformance = computed(() => {
   if (employeesStore.employees.length === 0) return 0;
-  const total = employeesStore.employees.reduce((sum, emp) => sum + emp.performanceRating, 0);
+  const total = employeesStore.employees.reduce(
+    (sum, emp) => sum + emp.performanceRating,
+    0
+  );
   return total / employeesStore.employees.length;
 });
 
@@ -614,10 +618,6 @@ const exportData = () => {
 const getCompanyName = (companyId: string) => {
   const company = companiesStore.companies.find((c) => c.id === companyId);
   return company?.name || "Unknown Company";
-};
-
-const getInitials = (firstName: string, lastName: string) => {
-  return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
 };
 
 const formatCurrency = (amount: number) => {

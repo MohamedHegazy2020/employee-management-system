@@ -30,8 +30,7 @@
     <div v-else-if="type === 'avatar'" class="avatar-cell">
       <div class="flex items-center">
         <Avatar
-          :image="data.avatar || data.image"
-          :alt="data.name || data.title"
+          v-bind="getAvatarProps(data.name || data.title, undefined, data.avatar || data.image)"
           size="small"
           shape="circle"
           class="mr-3"
@@ -91,6 +90,7 @@
 import { computed } from "vue";
 import Avatar from "primevue/avatar";
 import Tag from "primevue/tag";
+import { getAvatarProps } from "@/utils/avatar";
 
 interface Props {
   value: any;

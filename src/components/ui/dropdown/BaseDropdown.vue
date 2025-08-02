@@ -8,7 +8,6 @@
         :options="options"
         :optionLabel="optionLabel"
         :optionValue="optionValue"
-        :placeholder="placeholder"
         :disabled="disabled"
         :class="dropdownClasses"
         :required="required"
@@ -99,7 +98,6 @@ interface Props {
   modelValue: any;
   options: any[];
   label?: string;
-  placeholder?: string;
   id?: string;
   error?: string;
   hint?: string;
@@ -218,7 +216,7 @@ const handleFocus = (event: Event) => {
   left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  background: white;
+  background: rgb(249 250 251);
   padding: 0 0.5rem;
   color: rgb(107 114 128);
   font-size: 0.875rem;
@@ -234,8 +232,8 @@ const handleFocus = (event: Event) => {
   transform: translateY(-50%) scale(0.85);
   color: rgb(59 130 246);
   font-weight: 600;
-  background: white;
-  box-shadow: 0 0 0 2px white;
+  background: rgb(249 250 251);
+  box-shadow: 0 0 0 2px rgb(249 250 251);
 }
 
 .floating-label-focused {
@@ -355,7 +353,7 @@ const handleFocus = (event: Event) => {
   width: 100%;
   border: 2px solid rgb(229 231 235);
   border-radius: 0.75rem;
-  background: white;
+  background: rgb(249 250 251);
   color: rgb(17 24 39);
   font-size: 0.875rem;
   font-weight: 500;
@@ -364,6 +362,11 @@ const handleFocus = (event: Event) => {
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px 0 rgb(0 0 0 / 0.06);
   position: relative;
   z-index: 2;
+}
+
+/* Hide default dropdown arrow to prevent double arrows */
+:deep(.modern-dropdown .p-dropdown-trigger-icon) {
+  display: none;
 }
 
 :deep(.modern-dropdown:focus) {
@@ -417,15 +420,15 @@ const handleFocus = (event: Event) => {
   border-color: rgb(34 197 94);
 }
 
-/* Placeholder Styling */
+/* Label Styling */
 :deep(.modern-dropdown .p-dropdown-label) {
-  color: rgb(156 163 175);
-  font-weight: 400;
+  color: rgb(17 24 39);
+  font-weight: 500;
   transition: color 0.2s ease;
 }
 
 :deep(.modern-dropdown:focus .p-dropdown-label) {
-  color: rgb(107 114 128);
+  color: rgb(59 130 246);
 }
 
 :deep(.modern-dropdown .p-dropdown-label.p-inputtext) {
@@ -453,7 +456,7 @@ const handleFocus = (event: Event) => {
 :deep(.modern-dropdown .p-dropdown-panel) {
   border: 2px solid rgb(229 231 235);
   border-radius: 0.75rem;
-  background: white;
+  background: rgb(249 250 251);
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
     0 4px 6px -2px rgb(0 0 0 / 0.05);
   margin-top: 0.5rem;
@@ -471,6 +474,7 @@ const handleFocus = (event: Event) => {
   transition: all 0.2s ease;
   border-radius: 0.375rem;
   margin: 0 0.5rem;
+  background: transparent;
 }
 
 :deep(.modern-dropdown .p-dropdown-item:hover) {
@@ -578,10 +582,6 @@ const handleFocus = (event: Event) => {
     background: rgb(31 41 55);
     border-color: rgb(75 85 99);
     color: rgb(243 244 246);
-  }
-
-  :deep(.modern-dropdown .p-dropdown-label) {
-    color: rgb(156 163 175);
   }
 
   .floating-label {

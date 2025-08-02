@@ -76,8 +76,13 @@
             <!-- Employee Avatar -->
             <div class="flex-shrink-0">
               <Avatar
-                :image="employee.avatar"
-                :label="getInitials(employee.firstName, employee.lastName)"
+                v-bind="
+                  getAvatarProps(
+                    employee.firstName,
+                    employee.lastName,
+                    employee.avatar
+                  )
+                "
                 size="xlarge"
                 shape="circle"
                 class="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-2xl font-bold"
@@ -528,19 +533,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useEmployeesStore } from "@/stores/employees";
 import { useCompaniesStore } from "@/stores/companies";
-import { BaseButton } from "@/components/ui";
+import { useDepartmentsStore } from "@/stores/departments";
 import Card from "primevue/card";
 import Avatar from "primevue/avatar";
 import Tag from "primevue/tag";
+import ProgressBar from "primevue/progressbar";
+import { BaseButton } from "@/components/ui";
+import { getAvatarProps } from "@/utils/avatar";
 
 const route = useRoute();
 const router = useRouter();
 const employeesStore = useEmployeesStore();
 const companiesStore = useCompaniesStore();
+const departmentsStore = useDepartmentsStore();
 
 const employeeId = computed(() => route.params.id as string);
 const loading = ref(false);
@@ -579,10 +588,6 @@ const getManagerName = (managerId: string | null) => {
   if (!managerId) return null;
   const manager = employeesStore.employees.find((e) => e.id === managerId);
   return manager ? `${manager.firstName} ${manager.lastName}` : null;
-};
-
-const getInitials = (firstName: string, lastName: string) => {
-  return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
 };
 
 const formatCurrency = (amount: number) => {
@@ -627,6 +632,7 @@ onMounted(async () => {
   await Promise.all([
     employeesStore.fetchEmployees(),
     companiesStore.fetchCompanies(),
+    departmentsStore.fetchDepartments(),
   ]);
   fetchEmployeeDetails();
 });

@@ -1,11 +1,6 @@
 // Main dropdown component
 export { default as BaseDropdown } from "./BaseDropdown.vue";
 
-// Sub-components
-export { default as DropdownItem } from "./DropdownItem.vue";
-export { default as DropdownPanel } from "./DropdownPanel.vue";
-export { default as DropdownFilter } from "./DropdownFilter.vue";
-
 // Types
 export interface DropdownOption {
   label: string;

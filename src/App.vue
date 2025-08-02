@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineOptions({ name: "CompanyTreeView" });
+defineOptions({ name: "App" });
 // App component just renders the router view
 </script>
 

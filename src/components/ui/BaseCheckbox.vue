@@ -90,7 +90,7 @@ const handleChange = (event: any) => {
 :deep(.p-checkbox) {
   border: 1px solid rgb(209 213 219);
   border-radius: 0.375rem;
-  background-color: white;
+  background-color: rgb(249 250 251);
   transition: all 0.2s ease-out;
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }

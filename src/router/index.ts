@@ -27,11 +27,6 @@ const router = createRouter({
       meta: { requiresGuest: true },
     },
     {
-      path: "/test-dropdown",
-      name: "TestDropdown",
-      component: () => import("@/components/ui/dropdown/DropdownTest.vue"),
-    },
-    {
       path: "/",
       component: () => import("@/layouts/AppLayout.vue"),
       meta: { requiresAuth: true },

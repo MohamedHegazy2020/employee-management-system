@@ -94,8 +94,7 @@
             <div class="flex items-center space-x-4">
               <div class="relative">
                 <Avatar
-                  :image="authStore.user?.avatar || '/default-avatar.png'"
-                  :alt="authStore.user?.name"
+                  v-bind="getAvatarProps(authStore.user?.name || '', undefined, authStore.user?.avatar)"
                   size="0.25rem"
                   shape="circle"
                   class="ring-3 ring-blue-200 shadow-lg group-hover:ring-blue-300 transition-all duration-300"
@@ -166,8 +165,7 @@
             >
               <div class="relative w-12 h-12 flex items-center justify-center">
                 <Avatar
-                  :image="authStore.user?.avatar || '/default-avatar.png'"
-                  :alt="authStore.user?.name"
+                  v-bind="getAvatarProps(authStore.user?.name || '', undefined, authStore.user?.avatar)"
                   size="normal"
                   shape="circle"
                   class="ring-2 ring-gray-200 shadow-md"
@@ -207,12 +205,13 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
-import { useRouter, useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import Sidebar from "primevue/sidebar";
 import Menu from "primevue/menu";
 import Avatar from "primevue/avatar";
 import { BaseButton } from "@/components/ui";
+import { getAvatarProps } from "@/utils/avatar";
 
 const router = useRouter();
 const route = useRoute();

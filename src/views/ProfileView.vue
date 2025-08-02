@@ -15,10 +15,11 @@
       <template #content>
         <div class="flex items-center space-x-6 mb-6">
           <div class="flex-shrink-0">
-            <img
-              :src="authStore.user?.avatar || '/default-avatar.png'"
-              :alt="authStore.user?.name"
-              class="w-20 h-20 rounded-full object-cover border-4 border-gray-200"
+            <Avatar
+              v-bind="getAvatarProps(authStore.user?.name || '', undefined, authStore.user?.avatar)"
+              size="xlarge"
+              shape="circle"
+              class="w-20 h-20 border-4 border-gray-200"
             />
           </div>
           <div>
@@ -205,9 +206,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, computed } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import Card from "primevue/card";
+import Avatar from "primevue/avatar";
 import Message from "primevue/message";
 import {
   BaseForm,
@@ -217,6 +219,7 @@ import {
   BaseCheckbox,
   BaseButton,
 } from "@/components/ui";
+import { getAvatarProps } from "@/utils/avatar";
 
 const authStore = useAuthStore();
 const loading = ref(false);

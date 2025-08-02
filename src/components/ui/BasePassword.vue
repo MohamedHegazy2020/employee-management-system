@@ -6,16 +6,24 @@
         <i :class="icon" />
       </div>
 
+      <!-- Password Toggle Icon -->
+      <div class="password-toggle-icon">
+        <i
+          :class="toggleIconClass"
+          @click="togglePasswordVisibility"
+          title="Toggle password visibility"
+        />
+      </div>
+
       <!-- Password Field -->
       <Password
         :id="id"
         v-model="passwordValue"
-        :placeholder="placeholder"
         :disabled="disabled"
         :class="passwordClasses"
         :required="required"
         :feedback="feedback"
-        :toggleMask="toggleMask"
+        :toggleMask="false"
         :promptLabel="promptLabel"
         :weakLabel="weakLabel"
         :mediumLabel="mediumLabel"
@@ -104,7 +112,6 @@ import Password from "primevue/password";
 interface Props {
   modelValue: string;
   label?: string;
-  placeholder?: string;
   id?: string;
   icon?: string;
   error?: string;
@@ -141,6 +148,7 @@ const emit = defineEmits<{
 }>();
 
 const isFocused = ref(false);
+const isPasswordVisible = ref(false);
 
 const passwordValue = computed({
   get: () => props.modelValue,
@@ -149,6 +157,10 @@ const passwordValue = computed({
 
 const hasValue = computed(() => {
   return props.modelValue && props.modelValue.length > 0;
+});
+
+const toggleIconClass = computed(() => {
+  return isPasswordVisible.value ? "pi pi-eye-slash" : "pi pi-eye";
 });
 
 const passwordStrength = computed(() => {
@@ -201,6 +213,7 @@ const passwordClasses = computed(() => {
     focused: isFocused.value ? "password-focused" : "",
     hasValue: hasValue.value ? "password-has-value" : "",
     hasIcon: props.icon ? "password-has-icon" : "",
+    hasToggle: "password-has-toggle",
   };
 
   return [
@@ -211,10 +224,20 @@ const passwordClasses = computed(() => {
     stateClasses.focused,
     stateClasses.hasValue,
     stateClasses.hasIcon,
+    stateClasses.hasToggle,
   ]
     .filter(Boolean)
     .join(" ");
 });
+
+const togglePasswordVisibility = () => {
+  isPasswordVisible.value = !isPasswordVisible.value;
+  // Update the input type
+  const input = document.querySelector(`#${props.id}`) as HTMLInputElement;
+  if (input) {
+    input.type = isPasswordVisible.value ? "text" : "password";
+  }
+};
 
 const handleInput = (event: Event) => {
   const target = event.target as HTMLInputElement;
@@ -261,12 +284,35 @@ const handleFocus = (event: Event) => {
   font-size: 1.125rem;
 }
 
+.password-toggle-icon {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  color: rgb(107 114 128);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.password-toggle-icon i {
+  font-size: 1rem;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+.password-toggle-icon:hover i {
+  color: rgb(59 130 246);
+  background: rgb(243 244 246);
+}
+
 .floating-label {
   position: absolute;
   left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  background: white;
+  background: rgb(249 250 251);
   padding: 0 0.5rem;
   color: rgb(107 114 128);
   font-size: 0.875rem;
@@ -282,8 +328,8 @@ const handleFocus = (event: Event) => {
   transform: translateY(-50%) scale(0.85);
   color: rgb(59 130 246);
   font-weight: 600;
-  background: white;
-  box-shadow: 0 0 0 2px white;
+  background: rgb(249 250 251);
+  box-shadow: 0 0 0 2px rgb(249 250 251);
 }
 
 .floating-label-focused {
@@ -301,7 +347,7 @@ const handleFocus = (event: Event) => {
 
 .status-icons {
   position: absolute;
-  right: 1rem;
+  right: 3rem;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -430,7 +476,7 @@ const handleFocus = (event: Event) => {
   width: 100%;
   border: 2px solid rgb(229 231 235);
   border-radius: 0.75rem;
-  background: white;
+  background: rgb(249 250 251);
   color: rgb(17 24 39);
   font-size: 0.875rem;
   font-weight: 500;
@@ -497,7 +543,11 @@ const handleFocus = (event: Event) => {
   padding-left: 3rem;
 }
 
-/* Placeholder Styling */
+:deep(.password-has-toggle) {
+  padding-right: 2.5rem;
+}
+
+/* Input Styling */
 :deep(.modern-password .p-password-input) {
   border: none;
   background: transparent;
@@ -508,29 +558,9 @@ const handleFocus = (event: Event) => {
   box-shadow: none;
 }
 
-:deep(.modern-password .p-password-input::placeholder) {
-  color: rgb(156 163 175);
-  font-weight: 400;
-  transition: color 0.2s ease;
-}
-
-:deep(.modern-password .p-password-input:focus::placeholder) {
-  color: rgb(107 114 128);
-}
-
-/* Toggle Button */
+/* Hide default toggle button */
 :deep(.modern-password .p-password-toggle) {
-  color: rgb(107 114 128);
-  transition: color 0.2s ease;
-  border: none;
-  background: transparent;
-  padding: 0.25rem;
-  border-radius: 0.25rem;
-}
-
-:deep(.modern-password .p-password-toggle:hover) {
-  color: rgb(59 130 246);
-  background: rgb(243 244 246);
+  display: none;
 }
 
 /* Panel Styling */
@@ -630,13 +660,28 @@ const handleFocus = (event: Event) => {
   transform: translateY(-50%) scale(1.1);
 }
 
+/* Focus state with toggle */
+:deep(.password-has-toggle:focus) ~ .password-toggle-icon {
+  color: rgb(59 130 246);
+}
+
 /* Error state with icon */
 :deep(.password-error) + .password-icon {
   color: rgb(239 68 68);
 }
 
+/* Error state with toggle */
+:deep(.password-error) ~ .password-toggle-icon {
+  color: rgb(239 68 68);
+}
+
 /* Success state with icon */
 :deep(.password-has-value:not(.password-error)) + .password-icon {
+  color: rgb(34 197 94);
+}
+
+/* Success state with toggle */
+:deep(.password-has-value:not(.password-error)) ~ .password-toggle-icon {
   color: rgb(34 197 94);
 }
 
@@ -659,10 +704,6 @@ const handleFocus = (event: Event) => {
     background: rgb(31 41 55);
     border-color: rgb(75 85 99);
     color: rgb(243 244 246);
-  }
-
-  :deep(.modern-password .p-password-input::placeholder) {
-    color: rgb(156 163 175);
   }
 
   .floating-label {

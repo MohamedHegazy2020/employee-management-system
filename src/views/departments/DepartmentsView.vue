@@ -46,8 +46,6 @@
           <BaseDropdown
             v-model="filters.companyId"
             :options="companyOptions"
-            option-label="label"
-            option-value="value"
             placeholder="Filter by Company"
             :show-clear="true"
             @change="handleFilterChange"
