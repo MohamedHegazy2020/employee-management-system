@@ -1,23 +1,13 @@
 <template>
   <div class="form-field">
-    <div class="relative group">
-      <span v-if="icon" class="p-input-icon-left w-full">
+    <div class="input-container">
+      <!-- Icon (if provided) -->
+      <div v-if="icon" class="input-icon">
         <i :class="icon" />
-        <InputText
-          :id="id"
-          v-model="inputValue"
-          :type="type"
-          :placeholder="placeholder"
-          :disabled="disabled"
-          :class="inputClasses"
-          :required="required"
-          @input="handleInput"
-          @blur="handleBlur"
-          @focus="handleFocus"
-        />
-      </span>
+      </div>
+
+      <!-- Input Field -->
       <InputText
-        v-else
         :id="id"
         v-model="inputValue"
         :type="type"
@@ -30,41 +20,78 @@
         @focus="handleFocus"
       />
 
-      <!-- Float Label -->
+      <!-- Floating Label -->
       <label
         v-if="label"
         :for="id"
-        class="float-label"
+        class="floating-label"
         :class="{
-          'float-label-active': hasValue || isFocused,
-          'float-label-error': error,
+          'floating-label-active': hasValue || isFocused,
+          'floating-label-error': error,
+          'floating-label-focused': isFocused,
         }"
       >
         {{ label }}
-        <span v-if="required" class="text-red-500 ml-1">*</span>
+        <span v-if="required" class="required-indicator">*</span>
       </label>
 
-      <!-- Focus ring overlay -->
+      <!-- Status Icons -->
+      <div class="status-icons">
+        <i
+          v-if="error"
+          class="pi pi-exclamation-circle error-icon"
+          title="Error"
+        />
+        <i
+          v-else-if="hasValue && !error"
+          class="pi pi-check-circle success-icon"
+          title="Valid"
+        />
+        <i
+          v-if="loading"
+          class="pi pi-spin pi-spinner loading-icon"
+          title="Loading"
+        />
+      </div>
+
+      <!-- Focus Ring -->
       <div
-        class="absolute inset-0 rounded-lg pointer-events-none transition-all duration-200"
-        :class="focusRingClasses"
+        class="focus-ring"
+        :class="{
+          'focus-ring-active': isFocused,
+          'focus-ring-error': error,
+        }"
       ></div>
     </div>
 
-    <small
+    <!-- Error Message -->
+    <div
       v-if="error"
-      class="p-error text-red-600 text-xs font-medium mt-2 flex items-center"
+      class="error-message"
+      role="alert"
+      aria-live="polite"
     >
-      <i class="pi pi-exclamation-circle mr-1"></i>
-      {{ error }}
-    </small>
-    <small
+      <i class="pi pi-exclamation-triangle"></i>
+      <span>{{ error }}</span>
+    </div>
+
+    <!-- Hint Message -->
+    <div
       v-else-if="hint"
-      class="text-gray-500 text-xs mt-2 flex items-center"
+      class="hint-message"
     >
-      <i class="pi pi-info-circle mr-1"></i>
-      {{ hint }}
-    </small>
+      <i class="pi pi-info-circle"></i>
+      <span>{{ hint }}</span>
+    </div>
+
+    <!-- Character Counter (for text inputs) -->
+    <div
+      v-if="showCounter && type === 'text'"
+      class="character-counter"
+      :class="{ 'character-counter-warning': isNearLimit }"
+    >
+      {{ inputValue.length }}/{{ maxLength }}
+    </div>
   </div>
 </template>
 
@@ -83,20 +110,26 @@ interface Props {
   hint?: string;
   disabled?: boolean;
   required?: boolean;
+  loading?: boolean;
   size?: "small" | "medium" | "large";
+  maxLength?: number;
+  showCounter?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   type: "text",
   disabled: false,
   required: false,
+  loading: false,
   size: "medium",
+  showCounter: false,
 });
 
 const emit = defineEmits<{
   "update:modelValue": [value: string];
   blur: [event: Event];
   focus: [event: Event];
+  enter: [event: Event];
 }>();
 
 const isFocused = ref(false);
@@ -110,29 +143,35 @@ const hasValue = computed(() => {
   return props.modelValue && props.modelValue.length > 0;
 });
 
-const inputClasses = computed(() => {
-  const baseClasses = "w-full transition-all duration-300 ease-out";
-  const sizeClasses = {
-    small: "pt-5 pb-3 px-3 text-sm",
-    medium: "pt-7 pb-4 px-4 text-base",
-    large: "pt-9 pb-5 px-5 text-lg",
-  };
-  const errorClasses = props.error ? "border-red-300 bg-red-50" : "";
-  const disabledClasses = props.disabled
-    ? "bg-gray-50 text-gray-500 cursor-not-allowed"
-    : "";
-  const hasLabelClass = props.label ? "has-label" : "";
-
-  return `${baseClasses} ${
-    sizeClasses[props.size]
-  } ${errorClasses} ${disabledClasses} ${hasLabelClass}`;
+const isNearLimit = computed(() => {
+  if (!props.maxLength) return false;
+  return props.modelValue.length >= props.maxLength * 0.9;
 });
 
-const focusRingClasses = computed(() => {
-  if (props.error) {
-    return "ring-2 ring-red-200 opacity-0 group-focus-within:opacity-100";
-  }
-  return "ring-2 ring-blue-200 opacity-0 group-focus-within:opacity-100";
+const inputClasses = computed(() => {
+  const baseClasses = "modern-input";
+  const sizeClasses = {
+    small: "input-small",
+    medium: "input-medium",
+    large: "input-large",
+  };
+  const stateClasses = {
+    error: props.error ? "input-error" : "",
+    disabled: props.disabled ? "input-disabled" : "",
+    focused: isFocused.value ? "input-focused" : "",
+    hasValue: hasValue.value ? "input-has-value" : "",
+    hasIcon: props.icon ? "input-has-icon" : "",
+  };
+
+  return [
+    baseClasses,
+    sizeClasses[props.size],
+    stateClasses.error,
+    stateClasses.disabled,
+    stateClasses.focused,
+    stateClasses.hasValue,
+    stateClasses.hasIcon,
+  ].filter(Boolean).join(" ");
 });
 
 const handleInput = (event: Event) => {
@@ -153,240 +192,328 @@ const handleFocus = (event: Event) => {
 
 <style scoped>
 .form-field {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.5rem;
 }
 
-.float-label {
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
   position: absolute;
   left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  background-color: white;
-  padding: 0 0.25rem;
+  z-index: 10;
+  color: rgb(107 114 128);
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+.input-icon i {
+  font-size: 1.125rem;
+}
+
+.floating-label {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: white;
+  padding: 0 0.5rem;
   color: rgb(107 114 128);
   font-size: 0.875rem;
   font-weight: 500;
-  transition: all 0.2s ease-out;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
-  z-index: 10;
+  z-index: 5;
+  border-radius: 0.375rem;
 }
 
-.float-label-active {
-  top: 0.75rem;
-  transform: translateY(0);
-  font-size: 0.75rem;
+.floating-label-active {
+  top: 0;
+  transform: translateY(-50%) scale(0.85);
   color: rgb(59 130 246);
   font-weight: 600;
+  background: white;
+  box-shadow: 0 0 0 2px white;
 }
 
-.float-label-error {
+.floating-label-focused {
+  color: rgb(59 130 246);
+}
+
+.floating-label-error {
   color: rgb(239 68 68);
 }
 
-/* Input field styling */
-:deep(.p-inputtext) {
-  border: 1px solid rgb(209 213 219);
+.required-indicator {
+  color: rgb(239 68 68);
+  margin-left: 0.125rem;
+}
+
+.status-icons {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.error-icon {
+  color: rgb(239 68 68);
+  font-size: 1rem;
+  animation: shake 0.5s ease-in-out;
+}
+
+.success-icon {
+  color: rgb(34 197 94);
+  font-size: 1rem;
+  animation: bounce 0.5s ease-in-out;
+}
+
+.loading-icon {
+  color: rgb(59 130 246);
+  font-size: 1rem;
+}
+
+.focus-ring {
+  position: absolute;
+  inset: -2px;
   border-radius: 0.75rem;
-  background-color: white;
+  background: linear-gradient(135deg, rgb(59 130 246), rgb(147 51 234));
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 1;
+}
+
+.focus-ring-active {
+  opacity: 1;
+}
+
+.focus-ring-error {
+  background: linear-gradient(135deg, rgb(239 68 68), rgb(220 38 38));
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgb(239 68 68);
+  font-size: 0.75rem;
+  font-weight: 500;
+  animation: slideIn 0.3s ease-out;
+}
+
+.error-message i {
+  font-size: 0.875rem;
+}
+
+.hint-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgb(107 114 128);
+  font-size: 0.75rem;
+  animation: slideIn 0.3s ease-out;
+}
+
+.hint-message i {
+  font-size: 0.875rem;
+}
+
+.character-counter {
+  text-align: right;
+  font-size: 0.75rem;
+  color: rgb(107 114 128);
+  font-weight: 500;
+}
+
+.character-counter-warning {
+  color: rgb(245 158 11);
+}
+
+/* Modern Input Styling */
+:deep(.modern-input) {
+  width: 100%;
+  border: 2px solid rgb(229 231 235);
+  border-radius: 0.75rem;
+  background: white;
   color: rgb(17 24 39);
   font-size: 0.875rem;
+  font-weight: 500;
   line-height: 1.25rem;
-  transition: all 0.2s ease-out;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px 0 rgb(0 0 0 / 0.06);
+  position: relative;
+  z-index: 2;
 }
 
-:deep(.p-inputtext:focus) {
+:deep(.modern-input:focus) {
   outline: none;
-  border-color: rgb(59 130 246);
-  box-shadow: 0 0 0 3px rgb(59 130 246 / 0.1), 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  border-color: transparent;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -1px rgb(0 0 0 / 0.06);
 }
 
-:deep(.p-inputtext.p-invalid) {
+:deep(.modern-input:hover:not(:focus):not(.input-disabled)) {
+  border-color: rgb(156 163 175);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -1px rgb(0 0 0 / 0.06);
+  transform: translateY(-1px);
+}
+
+/* Size Variants */
+:deep(.input-small) {
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+}
+
+:deep(.input-medium) {
+  padding: 1rem 1.25rem;
+  font-size: 1rem;
+}
+
+:deep(.input-large) {
+  padding: 1.25rem 1.5rem;
+  font-size: 1.125rem;
+}
+
+/* State Variants */
+:deep(.input-error) {
   border-color: rgb(239 68 68);
-  box-shadow: 0 0 0 3px rgb(239 68 68 / 0.1);
+  background-color: rgb(254 242 242);
+  color: rgb(239 68 68);
 }
 
-:deep(.p-inputtext:disabled) {
+:deep(.input-disabled) {
   background-color: rgb(249 250 251);
   color: rgb(156 163 175);
   cursor: not-allowed;
   opacity: 0.7;
+  transform: none !important;
 }
 
-:deep(.p-inputtext.has-label) {
-  padding-top: 1.75rem;
-  padding-bottom: 1rem;
+:deep(.input-focused) {
+  border-color: transparent;
 }
 
-:deep(.p-inputtext:hover:not(:focus):not(.p-disabled)) {
-  border-color: rgb(156 163 175);
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+:deep(.input-has-value) {
+  border-color: rgb(34 197 94);
 }
 
-:deep(.p-input-icon-left .p-inputtext) {
+/* Icon Positioning */
+:deep(.input-has-icon) {
   padding-left: 3rem;
 }
 
-:deep(.p-input-icon-left .p-inputtext.has-label) {
-  padding-left: 3rem;
-  padding-top: 1.75rem;
-  padding-bottom: 1rem;
-}
-
-:deep(.p-input-icon-left i) {
+/* Placeholder Styling */
+:deep(.modern-input::placeholder) {
   color: rgb(156 163 175);
-  transition: color 0.2s;
-  position: absolute;
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 20;
+  font-weight: 400;
+  transition: color 0.2s ease;
 }
 
-:deep(.p-inputtext:focus + .p-input-icon-left i) {
+:deep(.modern-input:focus::placeholder) {
+  color: rgb(107 114 128);
+}
+
+/* Type-specific Styling */
+:deep(.modern-input[type="email"]) {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.25rem;
+  padding-right: 3rem;
+}
+
+:deep(.modern-input[type="password"]) {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.25rem;
+  padding-right: 3rem;
+}
+
+/* Animations */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Focus state with icon */
+:deep(.input-has-icon:focus) + .input-icon {
   color: rgb(59 130 246);
+  transform: translateY(-50%) scale(1.1);
 }
 
-:deep(.p-input-icon-left .float-label) {
-  left: 3rem;
-}
-
-/* Custom scrollbar for textarea-like inputs */
-:deep(.p-inputtext::-webkit-scrollbar) {
-  width: 0.5rem;
-}
-
-:deep(.p-inputtext::-webkit-scrollbar-track) {
-  background-color: rgb(243 244 246);
-  border-radius: 9999px;
-}
-
-:deep(.p-inputtext::-webkit-scrollbar-thumb) {
-  background-color: rgb(209 213 219);
-  border-radius: 9999px;
-}
-
-:deep(.p-inputtext::-webkit-scrollbar-thumb:hover) {
-  background-color: rgb(156 163 175);
-}
-
-/* Animation for error states */
-:deep(.p-inputtext.p-invalid) {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1);
-  border-color: rgb(252 165 165);
-  background-color: rgb(254 242 242);
-}
-
-/* Success state styling */
-:deep(.p-inputtext:not(.p-invalid):focus) {
-  border-color: rgb(34 197 94);
-  box-shadow: 0 0 0 2px rgb(187 247 208);
-}
-
-/* Loading state */
-:deep(.p-inputtext[disabled]) {
-  opacity: 0.6;
-}
-
-/* Custom focus styles for different input types */
-:deep(.p-inputtext[type="email"]:focus) {
-  border-color: rgb(147 51 234);
-  box-shadow: 0 0 0 2px rgb(233 213 255);
-}
-
-:deep(.p-inputtext[type="password"]:focus) {
-  border-color: rgb(249 115 22);
-  box-shadow: 0 0 0 2px rgb(254 215 170);
-}
-
-:deep(.p-inputtext[type="number"]:focus) {
-  border-color: rgb(34 197 94);
-  box-shadow: 0 0 0 2px rgb(187 247 208);
-}
-
-:deep(.p-inputtext[type="tel"]:focus) {
-  border-color: rgb(6 182 212);
-  box-shadow: 0 0 0 2px rgb(165 243 252);
-}
-
-:deep(.p-inputtext[type="url"]:focus) {
-  border-color: rgb(99 102 241);
-  box-shadow: 0 0 0 2px rgb(199 210 254);
-}
-
-/* Size-specific adjustments */
-:deep(.p-inputtext.small) {
-  padding-top: 1.5rem;
-  padding-bottom: 0.75rem;
-}
-
-:deep(.p-inputtext.large) {
-  padding-top: 2.5rem;
-  padding-bottom: 1.25rem;
-}
-
-:deep(.p-inputtext.small + .float-label) {
-  font-size: 0.75rem;
-}
-
-:deep(.p-inputtext.large + .float-label) {
-  font-size: 1rem;
-}
-
-/* Icon positioning for different sizes */
-:deep(.p-input-icon-left.small i) {
-  top: 1.5rem;
-  transform: none;
-}
-
-:deep(.p-input-icon-left.large i) {
-  top: 2.5rem;
-  transform: none;
-}
-
-/* Focus state adjustments */
-:deep(.p-inputtext:focus + .float-label) {
-  color: rgb(59 130 246);
-}
-
-:deep(.p-inputtext.p-invalid + .float-label) {
+/* Error state with icon */
+:deep(.input-error) + .input-icon {
   color: rgb(239 68 68);
 }
 
-/* Animation for label movement */
-@keyframes floatUp {
-  from {
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 0.875rem;
+/* Success state with icon */
+:deep(.input-has-value:not(.input-error)) + .input-icon {
+  color: rgb(34 197 94);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  :deep(.input-medium) {
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
   }
-  to {
-    top: 0.75rem;
-    transform: translateY(0);
-    font-size: 0.75rem;
+  
+  :deep(.input-large) {
+    padding: 1rem 1.25rem;
+    font-size: 1.125rem;
   }
 }
 
-@keyframes floatDown {
-  from {
-    top: 0.75rem;
-    transform: translateY(0);
-    font-size: 0.75rem;
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :deep(.modern-input) {
+    background: rgb(31 41 55);
+    border-color: rgb(75 85 99);
+    color: rgb(243 244 246);
   }
-  to {
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 0.875rem;
+  
+  :deep(.modern-input::placeholder) {
+    color: rgb(156 163 175);
   }
-}
-
-.float-label-active {
-  animation: floatUp 0.2s ease-out forwards;
-}
-
-.float-label:not(.float-label-active) {
-  animation: floatDown 0.2s ease-out forwards;
+  
+  .floating-label {
+    background: rgb(31 41 55);
+    color: rgb(156 163 175);
+  }
+  
+  .floating-label-active {
+    background: rgb(31 41 55);
+    box-shadow: 0 0 0 2px rgb(31 41 55);
+  }
 }
 </style>

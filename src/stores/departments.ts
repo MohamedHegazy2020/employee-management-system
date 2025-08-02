@@ -53,7 +53,11 @@ export const useDepartmentsStore = defineStore("departments", () => {
       );
     }
 
-    return filtered;
+    // Add company name to each department
+    return filtered.map(department => ({
+      ...department,
+      company: getCompanyName(department.companyId),
+    }));
   });
 
   const paginatedDepartments = computed(() => {
@@ -192,6 +196,19 @@ export const useDepartmentsStore = defineStore("departments", () => {
 
   const getDepartmentByCode = (code: string) => {
     return departments.value.find((d) => d.code === code);
+  };
+
+  const getCompanyName = (companyId: string) => {
+    // This would typically come from a companies store
+    // For now, we'll use a simple mapping
+    const companyMap: Record<string, string> = {
+      "1": "TechCorp",
+      "2": "Global Industries",
+      "3": "Innovation Labs",
+      "4": "Future Systems",
+      "5": "Digital Solutions",
+    };
+    return companyMap[companyId] || "Unknown Company";
   };
 
   const setSearchQuery = (query: string) => {

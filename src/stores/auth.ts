@@ -78,6 +78,10 @@ export const useAuthStore = defineStore("auth", () => {
     localStorage.removeItem("user");
   };
 
+  const clearError = () => {
+    error.value = null;
+  };
+
   const forgotPassword = async (email: string) => {
     loading.value = true;
     error.value = null;
@@ -157,6 +161,7 @@ export const useAuthStore = defineStore("auth", () => {
     userRole,
     login,
     logout,
+    clearError,
     forgotPassword,
     resetPassword,
     updateProfile,

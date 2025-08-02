@@ -1,6 +1,7 @@
 <template>
   <div class="form-field">
-    <div class="relative group">
+    <div class="textarea-container">
+      <!-- Textarea Field -->
       <Textarea
         :id="id"
         v-model="textareaValue"
@@ -15,41 +16,78 @@
         @focus="handleFocus"
       />
 
-      <!-- Float Label -->
+      <!-- Floating Label -->
       <label
         v-if="label"
         :for="id"
-        class="float-label"
+        class="floating-label"
         :class="{
-          'float-label-active': hasValue || isFocused,
-          'float-label-error': error,
+          'floating-label-active': hasValue || isFocused,
+          'floating-label-error': error,
+          'floating-label-focused': isFocused,
         }"
       >
         {{ label }}
-        <span v-if="required" class="text-red-500 ml-1">*</span>
+        <span v-if="required" class="required-indicator">*</span>
       </label>
 
-      <!-- Focus ring overlay -->
+      <!-- Status Icons -->
+      <div class="status-icons">
+        <i
+          v-if="error"
+          class="pi pi-exclamation-circle error-icon"
+          title="Error"
+        />
+        <i
+          v-else-if="hasValue && !error"
+          class="pi pi-check-circle success-icon"
+          title="Valid"
+        />
+        <i
+          v-if="loading"
+          class="pi pi-spin pi-spinner loading-icon"
+          title="Loading"
+        />
+      </div>
+
+      <!-- Focus Ring -->
       <div
-        class="absolute inset-0 rounded-xl pointer-events-none transition-all duration-200"
-        :class="focusRingClasses"
+        class="focus-ring"
+        :class="{
+          'focus-ring-active': isFocused,
+          'focus-ring-error': error,
+        }"
       ></div>
     </div>
 
-    <small
+    <!-- Error Message -->
+    <div
       v-if="error"
-      class="p-error text-red-600 text-xs font-medium mt-2 flex items-center"
+      class="error-message"
+      role="alert"
+      aria-live="polite"
     >
-      <i class="pi pi-exclamation-circle mr-1"></i>
-      {{ error }}
-    </small>
-    <small
+      <i class="pi pi-exclamation-triangle"></i>
+      <span>{{ error }}</span>
+    </div>
+
+    <!-- Hint Message -->
+    <div
       v-else-if="hint"
-      class="text-gray-500 text-xs mt-2 flex items-center"
+      class="hint-message"
     >
-      <i class="pi pi-info-circle mr-1"></i>
-      {{ hint }}
-    </small>
+      <i class="pi pi-info-circle"></i>
+      <span>{{ hint }}</span>
+    </div>
+
+    <!-- Character Counter -->
+    <div
+      v-if="showCounter"
+      class="character-counter"
+      :class="{ 'character-counter-warning': isNearLimit }"
+    >
+      {{ textareaValue.length }}/{{ maxLength }}
+    </div>
   </div>
 </template>
 
@@ -68,7 +106,10 @@ interface Props {
   required?: boolean;
   rows?: number;
   autoResize?: boolean;
+  loading?: boolean;
   size?: "small" | "medium" | "large";
+  maxLength?: number;
+  showCounter?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -76,7 +117,9 @@ const props = withDefaults(defineProps<Props>(), {
   required: false,
   rows: 3,
   autoResize: true,
+  loading: false,
   size: "medium",
+  showCounter: false,
 });
 
 const emit = defineEmits<{
@@ -96,29 +139,33 @@ const hasValue = computed(() => {
   return props.modelValue && props.modelValue.length > 0;
 });
 
-const textareaClasses = computed(() => {
-  const baseClasses = "w-full transition-all duration-300 ease-out";
-  const sizeClasses = {
-    small: "pt-5 pb-3 px-3 text-sm",
-    medium: "pt-7 pb-4 px-4 text-base",
-    large: "pt-9 pb-5 px-5 text-lg",
-  };
-  const errorClasses = props.error ? "border-red-300 bg-red-50" : "";
-  const disabledClasses = props.disabled
-    ? "bg-gray-50 text-gray-500 cursor-not-allowed"
-    : "";
-  const hasLabelClass = props.label ? "has-label" : "";
-
-  return `${baseClasses} ${
-    sizeClasses[props.size]
-  } ${errorClasses} ${disabledClasses} ${hasLabelClass}`;
+const isNearLimit = computed(() => {
+  if (!props.maxLength) return false;
+  return props.modelValue.length >= props.maxLength * 0.9;
 });
 
-const focusRingClasses = computed(() => {
-  if (props.error) {
-    return "ring-2 ring-red-200 opacity-0 group-focus-within:opacity-100";
-  }
-  return "ring-2 ring-blue-200 opacity-0 group-focus-within:opacity-100";
+const textareaClasses = computed(() => {
+  const baseClasses = "modern-textarea";
+  const sizeClasses = {
+    small: "textarea-small",
+    medium: "textarea-medium",
+    large: "textarea-large",
+  };
+  const stateClasses = {
+    error: props.error ? "textarea-error" : "",
+    disabled: props.disabled ? "textarea-disabled" : "",
+    focused: isFocused.value ? "textarea-focused" : "",
+    hasValue: hasValue.value ? "textarea-has-value" : "",
+  };
+
+  return [
+    baseClasses,
+    sizeClasses[props.size],
+    stateClasses.error,
+    stateClasses.disabled,
+    stateClasses.focused,
+    stateClasses.hasValue,
+  ].filter(Boolean).join(" ");
 });
 
 const handleInput = (event: Event) => {
@@ -139,168 +186,317 @@ const handleFocus = (event: Event) => {
 
 <style scoped>
 .form-field {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.5rem;
 }
 
-.float-label {
+.textarea-container {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+}
+
+.floating-label {
   position: absolute;
   left: 1rem;
-  top: 0.75rem;
-  background-color: white;
-  padding: 0 0.25rem;
+  top: 1rem;
+  background: white;
+  padding: 0 0.5rem;
   color: rgb(107 114 128);
-  font-size: 0.75rem;
-  font-weight: 600;
-  transition: all 0.2s ease-out;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
-  z-index: 10;
+  z-index: 5;
+  border-radius: 0.375rem;
 }
 
-.float-label-active {
+.floating-label-active {
+  top: 0;
+  transform: translateY(-50%) scale(0.85);
+  color: rgb(59 130 246);
+  font-weight: 600;
+  background: white;
+  box-shadow: 0 0 0 2px white;
+}
+
+.floating-label-focused {
   color: rgb(59 130 246);
 }
 
-.float-label-error {
+.floating-label-error {
   color: rgb(239 68 68);
 }
 
-/* Textarea field styling */
-:deep(.p-inputtextarea) {
-  border: 1px solid rgb(209 213 219);
+.required-indicator {
+  color: rgb(239 68 68);
+  margin-left: 0.125rem;
+}
+
+.status-icons {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.error-icon {
+  color: rgb(239 68 68);
+  font-size: 1rem;
+  animation: shake 0.5s ease-in-out;
+}
+
+.success-icon {
+  color: rgb(34 197 94);
+  font-size: 1rem;
+  animation: bounce 0.5s ease-in-out;
+}
+
+.loading-icon {
+  color: rgb(59 130 246);
+  font-size: 1rem;
+}
+
+.focus-ring {
+  position: absolute;
+  inset: -2px;
   border-radius: 0.75rem;
-  background-color: white;
+  background: linear-gradient(135deg, rgb(59 130 246), rgb(147 51 234));
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 1;
+}
+
+.focus-ring-active {
+  opacity: 1;
+}
+
+.focus-ring-error {
+  background: linear-gradient(135deg, rgb(239 68 68), rgb(220 38 38));
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgb(239 68 68);
+  font-size: 0.75rem;
+  font-weight: 500;
+  animation: slideIn 0.3s ease-out;
+}
+
+.error-message i {
+  font-size: 0.875rem;
+}
+
+.hint-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgb(107 114 128);
+  font-size: 0.75rem;
+  animation: slideIn 0.3s ease-out;
+}
+
+.hint-message i {
+  font-size: 0.875rem;
+}
+
+.character-counter {
+  text-align: right;
+  font-size: 0.75rem;
+  color: rgb(107 114 128);
+  font-weight: 500;
+}
+
+.character-counter-warning {
+  color: rgb(245 158 11);
+}
+
+/* Modern Textarea Styling */
+:deep(.modern-textarea) {
+  width: 100%;
+  border: 2px solid rgb(229 231 235);
+  border-radius: 0.75rem;
+  background: white;
   color: rgb(17 24 39);
   font-size: 0.875rem;
+  font-weight: 500;
   line-height: 1.5;
-  transition: all 0.2s ease-out;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px 0 rgb(0 0 0 / 0.06);
+  position: relative;
+  z-index: 2;
   resize: vertical;
   min-height: 6rem;
 }
 
-:deep(.p-inputtextarea:focus) {
+:deep(.modern-textarea:focus) {
   outline: none;
-  border-color: rgb(59 130 246);
-  box-shadow: 0 0 0 3px rgb(59 130 246 / 0.1), 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  border-color: transparent;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -1px rgb(0 0 0 / 0.06);
 }
 
-:deep(.p-inputtextarea.p-invalid) {
+:deep(.modern-textarea:hover:not(:focus):not(.textarea-disabled)) {
+  border-color: rgb(156 163 175);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -1px rgb(0 0 0 / 0.06);
+  transform: translateY(-1px);
+}
+
+/* Size Variants */
+:deep(.textarea-small) {
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  min-height: 5rem;
+}
+
+:deep(.textarea-medium) {
+  padding: 1rem 1.25rem;
+  font-size: 1rem;
+  min-height: 6rem;
+}
+
+:deep(.textarea-large) {
+  padding: 1.25rem 1.5rem;
+  font-size: 1.125rem;
+  min-height: 8rem;
+}
+
+/* State Variants */
+:deep(.textarea-error) {
   border-color: rgb(239 68 68);
-  box-shadow: 0 0 0 3px rgb(239 68 68 / 0.1);
+  background-color: rgb(254 242 242);
+  color: rgb(239 68 68);
 }
 
-:deep(.p-inputtextarea:disabled) {
+:deep(.textarea-disabled) {
   background-color: rgb(249 250 251);
   color: rgb(156 163 175);
   cursor: not-allowed;
   opacity: 0.7;
+  transform: none !important;
 }
 
-/* Custom scrollbar for textarea */
-:deep(.p-inputtextarea::-webkit-scrollbar) {
+:deep(.textarea-focused) {
+  border-color: transparent;
+}
+
+:deep(.textarea-has-value) {
+  border-color: rgb(34 197 94);
+}
+
+/* Placeholder Styling */
+:deep(.modern-textarea::placeholder) {
+  color: rgb(156 163 175);
+  font-weight: 400;
+  transition: color 0.2s ease;
+}
+
+:deep(.modern-textarea:focus::placeholder) {
+  color: rgb(107 114 128);
+}
+
+/* Custom Scrollbar */
+:deep(.modern-textarea::-webkit-scrollbar) {
   width: 0.5rem;
 }
 
-:deep(.p-inputtextarea::-webkit-scrollbar-track) {
-  background-color: rgb(243 244 246);
-  border-radius: 9999px;
+:deep(.modern-textarea::-webkit-scrollbar-track) {
+  background: rgb(243 244 246);
+  border-radius: 0.25rem;
 }
 
-:deep(.p-inputtextarea::-webkit-scrollbar-thumb) {
-  background-color: rgb(209 213 219);
-  border-radius: 9999px;
+:deep(.modern-textarea::-webkit-scrollbar-thumb) {
+  background: rgb(209 213 219);
+  border-radius: 0.25rem;
+  transition: background 0.2s ease;
 }
 
-:deep(.p-inputtextarea::-webkit-scrollbar-thumb:hover) {
-  background-color: rgb(156 163 175);
+:deep(.modern-textarea::-webkit-scrollbar-thumb:hover) {
+  background: rgb(156 163 175);
 }
 
-/* Animation for error states */
-:deep(.p-inputtextarea.p-invalid) {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1);
-  border-color: rgb(252 165 165);
-  background-color: rgb(254 242 242);
+/* Resize Handle */
+:deep(.modern-textarea::-webkit-resizer) {
+  border: 2px solid rgb(229 231 235);
+  border-radius: 0.25rem;
+  background: rgb(249 250 251);
 }
 
-/* Success state styling */
-:deep(.p-inputtextarea:not(.p-invalid):focus) {
-  border-color: rgb(34 197 94);
-  box-shadow: 0 0 0 2px rgb(187 247 208);
+/* Animations */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
 }
 
-/* Loading state */
-:deep(.p-inputtextarea[disabled]) {
-  opacity: 0.6;
+@keyframes bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
 }
 
-/* Auto-resize transition */
-:deep(.p-inputtextarea) {
-  transition: height 0.3s ease-out;
-  line-height: 1.625;
-}
-
-/* Size-specific adjustments */
-:deep(.p-inputtextarea.small) {
-  padding-top: 2.5rem;
-}
-
-:deep(.p-inputtextarea.large) {
-  padding-top: 3.5rem;
-}
-
-:deep(.p-inputtextarea.small + .float-label) {
-  font-size: 0.7rem;
-  top: 0.75rem;
-}
-
-:deep(.p-inputtextarea.large + .float-label) {
-  font-size: 0.875rem;
-  top: 1.25rem;
-}
-
-/* Focus state adjustments */
-:deep(.p-inputtextarea:focus + .float-label) {
-  color: rgb(59 130 246);
-}
-
-:deep(.p-inputtextarea.p-invalid + .float-label) {
-  color: rgb(239 68 68);
-}
-
-/* Animation for label movement */
-@keyframes floatUp {
+@keyframes slideIn {
   from {
-    top: 1.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
+    opacity: 0;
+    transform: translateY(-10px);
   }
   to {
-    top: 0.75rem;
-    font-size: 0.75rem;
-    font-weight: 600;
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-@keyframes floatDown {
-  from {
-    top: 0.75rem;
-    font-size: 0.75rem;
-    font-weight: 600;
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  :deep(.textarea-medium) {
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
   }
-  to {
-    top: 1.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
+  
+  :deep(.textarea-large) {
+    padding: 1rem 1.25rem;
+    font-size: 1.125rem;
   }
 }
 
-.float-label-active {
-  animation: floatUp 0.2s ease-out forwards;
-}
-
-.float-label:not(.float-label-active) {
-  animation: floatDown 0.2s ease-out forwards;
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :deep(.modern-textarea) {
+    background: rgb(31 41 55);
+    border-color: rgb(75 85 99);
+    color: rgb(243 244 246);
+  }
+  
+  :deep(.modern-textarea::placeholder) {
+    color: rgb(156 163 175);
+  }
+  
+  .floating-label {
+    background: rgb(31 41 55);
+    color: rgb(156 163 175);
+  }
+  
+  .floating-label-active {
+    background: rgb(31 41 55);
+    box-shadow: 0 0 0 2px rgb(31 41 55);
+  }
+  
+  :deep(.modern-textarea::-webkit-scrollbar-track) {
+    background: rgb(55 65 81);
+  }
+  
+  :deep(.modern-textarea::-webkit-scrollbar-thumb) {
+    background: rgb(107 114 128);
+  }
+  
+  :deep(.modern-textarea::-webkit-scrollbar-thumb:hover) {
+    background: rgb(156 163 175);
+  }
 }
 </style>

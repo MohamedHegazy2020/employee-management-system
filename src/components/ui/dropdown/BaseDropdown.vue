@@ -1,16 +1,7 @@
 <template>
   <div class="form-field">
-    <label
-      v-if="label"
-      :for="id"
-      class="block text-sm font-semibold text-gray-700 mb-2 transition-colors duration-200"
-      :class="{ 'text-red-600': error }"
-    >
-      {{ label }}
-      <span v-if="required" class="text-red-500 ml-1">*</span>
-    </label>
-
-    <div class="relative group">
+    <div class="dropdown-container">
+      <!-- Dropdown Field -->
       <Dropdown
         :id="id"
         v-model="dropdownValue"
@@ -30,32 +21,78 @@
         @focus="handleFocus"
       />
 
-      <!-- Focus ring overlay -->
+      <!-- Floating Label -->
+      <label
+        v-if="label"
+        :for="id"
+        class="floating-label"
+        :class="{
+          'floating-label-active': hasValue || isFocused,
+          'floating-label-error': error,
+          'floating-label-focused': isFocused,
+        }"
+      >
+        {{ label }}
+        <span v-if="required" class="required-indicator">*</span>
+      </label>
+
+      <!-- Status Icons -->
+      <div class="status-icons">
+        <i
+          v-if="error"
+          class="pi pi-exclamation-circle error-icon"
+          title="Error"
+        />
+        <i
+          v-else-if="hasValue && !error"
+          class="pi pi-check-circle success-icon"
+          title="Valid"
+        />
+        <i
+          v-if="loading"
+          class="pi pi-spin pi-spinner loading-icon"
+          title="Loading"
+        />
+        <i
+          v-else
+          class="pi pi-chevron-down dropdown-icon"
+          :class="{ 'dropdown-icon-active': isFocused }"
+          title="Dropdown"
+        />
+      </div>
+
+      <!-- Focus Ring -->
       <div
-        class="absolute inset-0 rounded-xl pointer-events-none transition-all duration-200"
-        :class="focusRingClasses"
+        class="focus-ring"
+        :class="{
+          'focus-ring-active': isFocused,
+          'focus-ring-error': error,
+        }"
       ></div>
     </div>
 
-    <small
-      v-if="error"
-      class="p-error text-red-600 text-xs font-medium mt-2 flex items-center"
-    >
-      <i class="pi pi-exclamation-circle mr-1"></i>
-      {{ error }}
-    </small>
-    <small
-      v-else-if="hint"
-      class="text-gray-500 text-xs mt-2 flex items-center"
-    >
-      <i class="pi pi-info-circle mr-1"></i>
-      {{ hint }}
-    </small>
+    <!-- Error Message -->
+    <div v-if="error" class="error-message" role="alert" aria-live="polite">
+      <i class="pi pi-exclamation-triangle"></i>
+      <span>{{ error }}</span>
+    </div>
+
+    <!-- Hint Message -->
+    <div v-else-if="hint" class="hint-message">
+      <i class="pi pi-info-circle"></i>
+      <span>{{ hint }}</span>
+    </div>
+
+    <!-- Selected Value Display -->
+    <div v-if="hasValue && showSelectedValue" class="selected-value">
+      <i class="pi pi-check text-green-600"></i>
+      <span>{{ selectedLabel }}</span>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import Dropdown from "primevue/dropdown";
 
 interface Props {
@@ -75,6 +112,7 @@ interface Props {
   showClear?: boolean;
   loading?: boolean;
   size?: "small" | "medium" | "large";
+  showSelectedValue?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -87,6 +125,7 @@ const props = withDefaults(defineProps<Props>(), {
   showClear: false,
   loading: false,
   size: "medium",
+  showSelectedValue: false,
 });
 
 const emit = defineEmits<{
@@ -96,33 +135,53 @@ const emit = defineEmits<{
   focus: [event: Event];
 }>();
 
+const isFocused = ref(false);
+
 const dropdownValue = computed({
   get: () => props.modelValue,
   set: (value: any) => emit("update:modelValue", value),
 });
 
-const dropdownClasses = computed(() => {
-  const baseClasses = "w-full transition-all duration-300 ease-out";
-  const sizeClasses = {
-    small: "text-sm",
-    medium: "text-base",
-    large: "text-lg",
-  };
-  const errorClasses = props.error ? "border-red-300 bg-red-50" : "";
-  const disabledClasses = props.disabled
-    ? "bg-gray-50 text-gray-500 cursor-not-allowed"
-    : "";
-
-  return `${baseClasses} ${
-    sizeClasses[props.size]
-  } ${errorClasses} ${disabledClasses}`;
+const hasValue = computed(() => {
+  return (
+    props.modelValue !== null &&
+    props.modelValue !== undefined &&
+    props.modelValue !== ""
+  );
 });
 
-const focusRingClasses = computed(() => {
-  if (props.error) {
-    return "ring-2 ring-red-200 opacity-0 group-focus-within:opacity-100";
-  }
-  return "ring-2 ring-blue-200 opacity-0 group-focus-within:opacity-100";
+const selectedLabel = computed(() => {
+  if (!hasValue.value) return "";
+  const selectedOption = props.options.find(
+    (option) => option[props.optionValue] === props.modelValue
+  );
+  return selectedOption ? selectedOption[props.optionLabel] : "";
+});
+
+const dropdownClasses = computed(() => {
+  const baseClasses = "modern-dropdown";
+  const sizeClasses = {
+    small: "dropdown-small",
+    medium: "dropdown-medium",
+    large: "dropdown-large",
+  };
+  const stateClasses = {
+    error: props.error ? "dropdown-error" : "",
+    disabled: props.disabled ? "dropdown-disabled" : "",
+    focused: isFocused.value ? "dropdown-focused" : "",
+    hasValue: hasValue.value ? "dropdown-has-value" : "",
+  };
+
+  return [
+    baseClasses,
+    sizeClasses[props.size],
+    stateClasses.error,
+    stateClasses.disabled,
+    stateClasses.focused,
+    stateClasses.hasValue,
+  ]
+    .filter(Boolean)
+    .join(" ");
 });
 
 const handleChange = (event: any) => {
@@ -130,223 +189,428 @@ const handleChange = (event: any) => {
 };
 
 const handleBlur = (event: Event) => {
+  isFocused.value = false;
   emit("blur", event);
 };
 
 const handleFocus = (event: Event) => {
+  isFocused.value = true;
   emit("focus", event);
 };
 </script>
 
 <style scoped>
 .form-field {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.5rem;
 }
 
-/* Dropdown field styling */
-:deep(.p-dropdown) {
-  border: 1px solid rgb(209 213 219);
-  border-radius: 0.75rem;
-  background-color: white;
-  transition: all 0.2s ease-out;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  min-height: 2.75rem;
-}
-
-:deep(.p-dropdown:not(.p-disabled):hover) {
-  border-color: rgb(156 163 175);
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-}
-
-:deep(.p-dropdown:not(.p-disabled).p-focus) {
-  outline: none;
-  border-color: rgb(59 130 246);
-  box-shadow: 0 0 0 3px rgb(59 130 246 / 0.1), 0 1px 2px 0 rgb(0 0 0 / 0.05);
-}
-
-:deep(.p-dropdown.p-disabled) {
-  background-color: rgb(249 250 251);
-  color: rgb(107 114 128);
-  cursor: not-allowed;
-  border-color: rgb(229 231 235);
-  box-shadow: none;
-}
-
-:deep(.p-dropdown-label) {
-  color: rgb(17 24 39);
-  font-weight: 500;
-  padding: 0.5rem 0.75rem;
-}
-
-:deep(.p-dropdown-trigger) {
-  color: rgb(156 163 175);
-  transition: color 0.2s;
-  width: 2.5rem;
-  height: 2.5rem;
+.dropdown-container {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
 }
 
-:deep(.p-dropdown:not(.p-disabled).p-focus .p-dropdown-trigger) {
+.floating-label {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: white;
+  padding: 0 0.5rem;
+  color: rgb(107 114 128);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  z-index: 5;
+  border-radius: 0.375rem;
+}
+
+.floating-label-active {
+  top: 0;
+  transform: translateY(-50%) scale(0.85);
+  color: rgb(59 130 246);
+  font-weight: 600;
+  background: white;
+  box-shadow: 0 0 0 2px white;
+}
+
+.floating-label-focused {
   color: rgb(59 130 246);
 }
 
-/* Dropdown panel styling */
-:deep(.p-dropdown-panel) {
-  border: 1px solid rgb(229 231 235);
-  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1),
-    0 8px 10px -6px rgb(0 0 0 / 0.1);
+.floating-label-error {
+  color: rgb(239 68 68);
+}
+
+.required-indicator {
+  color: rgb(239 68 68);
+  margin-left: 0.125rem;
+}
+
+.status-icons {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.error-icon {
+  color: rgb(239 68 68);
+  font-size: 1rem;
+  animation: shake 0.5s ease-in-out;
+}
+
+.success-icon {
+  color: rgb(34 197 94);
+  font-size: 1rem;
+  animation: bounce 0.5s ease-in-out;
+}
+
+.loading-icon {
+  color: rgb(59 130 246);
+  font-size: 1rem;
+}
+
+.dropdown-icon {
+  color: rgb(107 114 128);
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.dropdown-icon-active {
+  color: rgb(59 130 246);
+  transform: rotate(180deg);
+}
+
+.focus-ring {
+  position: absolute;
+  inset: -2px;
   border-radius: 0.75rem;
-  background-color: rgb(255 255 255);
+  background: linear-gradient(135deg, rgb(59 130 246), rgb(147 51 234));
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 1;
+}
+
+.focus-ring-active {
+  opacity: 1;
+}
+
+.focus-ring-error {
+  background: linear-gradient(135deg, rgb(239 68 68), rgb(220 38 38));
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgb(239 68 68);
+  font-size: 0.75rem;
+  font-weight: 500;
+  animation: slideIn 0.3s ease-out;
+}
+
+.error-message i {
+  font-size: 0.875rem;
+}
+
+.hint-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgb(107 114 128);
+  font-size: 0.75rem;
+  animation: slideIn 0.3s ease-out;
+}
+
+.hint-message i {
+  font-size: 0.875rem;
+}
+
+.selected-value {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgb(34 197 94);
+  font-size: 0.75rem;
+  font-weight: 500;
+  animation: slideIn 0.3s ease-out;
+}
+
+.selected-value i {
+  font-size: 0.875rem;
+}
+
+/* Modern Dropdown Styling */
+:deep(.modern-dropdown) {
+  width: 100%;
+  border: 2px solid rgb(229 231 235);
+  border-radius: 0.75rem;
+  background: white;
+  color: rgb(17 24 39);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px 0 rgb(0 0 0 / 0.06);
+  position: relative;
+  z-index: 2;
+}
+
+:deep(.modern-dropdown:focus) {
+  outline: none;
+  border-color: transparent;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -1px rgb(0 0 0 / 0.06);
+}
+
+:deep(.modern-dropdown:hover:not(:focus):not(.dropdown-disabled)) {
+  border-color: rgb(156 163 175);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -1px rgb(0 0 0 / 0.06);
+  transform: translateY(-1px);
+}
+
+/* Size Variants */
+:deep(.dropdown-small) {
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+}
+
+:deep(.dropdown-medium) {
+  padding: 1rem 1.25rem;
+  font-size: 1rem;
+}
+
+:deep(.dropdown-large) {
+  padding: 1.25rem 1.5rem;
+  font-size: 1.125rem;
+}
+
+/* State Variants */
+:deep(.dropdown-error) {
+  border-color: rgb(239 68 68);
+  background-color: rgb(254 242 242);
+  color: rgb(239 68 68);
+}
+
+:deep(.dropdown-disabled) {
+  background-color: rgb(249 250 251);
+  color: rgb(156 163 175);
+  cursor: not-allowed;
+  opacity: 0.7;
+  transform: none !important;
+}
+
+:deep(.dropdown-focused) {
+  border-color: transparent;
+}
+
+:deep(.dropdown-has-value) {
+  border-color: rgb(34 197 94);
+}
+
+/* Placeholder Styling */
+:deep(.modern-dropdown .p-dropdown-label) {
+  color: rgb(156 163 175);
+  font-weight: 400;
+  transition: color 0.2s ease;
+}
+
+:deep(.modern-dropdown:focus .p-dropdown-label) {
+  color: rgb(107 114 128);
+}
+
+:deep(.modern-dropdown .p-dropdown-label.p-inputtext) {
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Dropdown Trigger */
+:deep(.modern-dropdown .p-dropdown-trigger) {
+  width: auto;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: rgb(107 114 128);
+  transition: color 0.2s ease;
+}
+
+:deep(.modern-dropdown:focus .p-dropdown-trigger) {
+  color: rgb(59 130 246);
+}
+
+/* Dropdown Panel */
+:deep(.modern-dropdown .p-dropdown-panel) {
+  border: 2px solid rgb(229 231 235);
+  border-radius: 0.75rem;
+  background: white;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -2px rgb(0 0 0 / 0.05);
   margin-top: 0.5rem;
-  overflow: hidden;
-  z-index: 1000;
+  animation: slideDown 0.2s ease-out;
 }
 
-:deep(.p-dropdown-items-wrapper) {
-  max-height: 200px;
-  overflow-y: auto;
-  background-color: rgb(255 255 255);
+:deep(.modern-dropdown .p-dropdown-items) {
+  padding: 0.5rem 0;
 }
 
-:deep(.p-dropdown-item) {
+:deep(.modern-dropdown .p-dropdown-item) {
   padding: 0.75rem 1rem;
   color: rgb(17 24 39);
-  transition: all 0.2s;
-  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
   border-radius: 0.375rem;
-  margin: 0.125rem;
-  background-color: transparent;
+  margin: 0 0.5rem;
 }
 
-:deep(.p-dropdown-item:hover) {
-  background-color: rgb(239 246 255);
+:deep(.modern-dropdown .p-dropdown-item:hover) {
+  background: rgb(243 244 246);
   color: rgb(59 130 246);
   transform: translateX(0.25rem);
 }
 
-:deep(.p-dropdown-item.p-highlight) {
-  background-color: rgb(59 130 246);
-  color: rgb(255 255 255);
-  font-weight: 600;
+:deep(.modern-dropdown .p-dropdown-item.p-highlight) {
+  background: rgb(59 130 246);
+  color: white;
 }
 
-:deep(.p-dropdown-item.p-highlight:hover) {
-  background-color: rgb(37 99 235);
-  color: rgb(255 255 255);
-}
-
-/* Filter input styling */
-:deep(.p-dropdown-filter) {
+/* Filter Input */
+:deep(.modern-dropdown .p-dropdown-filter) {
   border: 1px solid rgb(229 231 235);
   border-radius: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  margin: 0.5rem;
-  width: calc(100% - 1rem);
-  background-color: rgb(249 250 251);
+  background: rgb(249 250 251);
   color: rgb(17 24 39);
   font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
+  margin: 0.5rem;
+  transition: all 0.2s ease;
 }
 
-:deep(.p-dropdown-filter:focus) {
-  border-color: rgb(59 130 246);
-  box-shadow: 0 0 0 2px rgb(147 197 253);
+:deep(.modern-dropdown .p-dropdown-filter:focus) {
   outline: none;
-  background-color: rgb(255 255 255);
+  border-color: rgb(59 130 246);
+  background: white;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.1);
 }
 
-/* Custom scrollbar for dropdown */
-:deep(.p-dropdown-items-wrapper::-webkit-scrollbar) {
-  width: 0.5rem;
+/* Clear Button */
+:deep(.modern-dropdown .p-dropdown-clear-icon) {
+  color: rgb(156 163 175);
+  transition: color 0.2s ease;
 }
 
-:deep(.p-dropdown-items-wrapper::-webkit-scrollbar-track) {
-  background-color: rgb(243 244 246);
-  border-radius: 9999px;
+:deep(.modern-dropdown .p-dropdown-clear-icon:hover) {
+  color: rgb(239 68 68);
 }
 
-:deep(.p-dropdown-items-wrapper::-webkit-scrollbar-thumb) {
-  background-color: rgb(209 213 219);
-  border-radius: 9999px;
-}
-
-:deep(.p-dropdown-items-wrapper::-webkit-scrollbar-thumb:hover) {
-  background-color: rgb(156 163 175);
-}
-
-/* Loading state */
-:deep(.p-dropdown.p-loading) {
-  position: relative;
-}
-
-:deep(.p-dropdown.p-loading::after) {
-  content: "";
-  position: absolute;
-  top: 50%;
-  right: 2.5rem;
-  width: 1rem;
-  height: 1rem;
-  border: 2px solid rgb(229 231 235);
-  border-top: 2px solid rgb(59 130 246);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  transform: translateY(-50%);
-}
-
-/* Animation for error states */
-:deep(.p-dropdown.p-invalid) {
-  border-color: rgb(239 68 68);
-  box-shadow: 0 0 0 3px rgb(239 68 68 / 0.1);
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1);
-  background-color: rgb(254 242 242);
-}
-
-/* Success state styling */
-:deep(.p-dropdown:not(.p-invalid).p-focus) {
-  border-color: rgb(34 197 94);
-  box-shadow: 0 0 0 2px rgb(187 247 208);
-}
-
-/* Loading state */
-:deep(.p-dropdown[disabled]) {
-  opacity: 0.6;
-}
-
-/* Fade in animation for panel */
-:deep(.p-dropdown-panel) {
-  animation: fadeIn 0.2s ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-0.5rem) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes spin {
-  from {
-    transform: translateY(-50%) rotate(0deg);
-  }
-  to {
-    transform: translateY(-50%) rotate(360deg);
-  }
-}
-
-@keyframes pulse {
+/* Animations */
+@keyframes shake {
   0%,
   100% {
-    opacity: 1;
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-2px);
+  }
+  75% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: scale(1);
   }
   50% {
-    opacity: 0.5;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  :deep(.dropdown-medium) {
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+  }
+
+  :deep(.dropdown-large) {
+    padding: 1rem 1.25rem;
+    font-size: 1.125rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :deep(.modern-dropdown) {
+    background: rgb(31 41 55);
+    border-color: rgb(75 85 99);
+    color: rgb(243 244 246);
+  }
+
+  :deep(.modern-dropdown .p-dropdown-label) {
+    color: rgb(156 163 175);
+  }
+
+  .floating-label {
+    background: rgb(31 41 55);
+    color: rgb(156 163 175);
+  }
+
+  .floating-label-active {
+    background: rgb(31 41 55);
+    box-shadow: 0 0 0 2px rgb(31 41 55);
+  }
+
+  :deep(.modern-dropdown .p-dropdown-panel) {
+    background: rgb(31 41 55);
+    border-color: rgb(75 85 99);
+  }
+
+  :deep(.modern-dropdown .p-dropdown-item) {
+    color: rgb(243 244 246);
+  }
+
+  :deep(.modern-dropdown .p-dropdown-item:hover) {
+    background: rgb(55 65 81);
+  }
+
+  :deep(.modern-dropdown .p-dropdown-filter) {
+    background: rgb(55 65 81);
+    border-color: rgb(75 85 99);
+    color: rgb(243 244 246);
   }
 }
 </style>

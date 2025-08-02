@@ -57,6 +57,8 @@
           <BaseDropdown
             v-model="filters.department"
             :options="departmentOptions"
+            option-label="label"
+            option-value="value"
             placeholder="Filter by Department"
             :show-clear="true"
             @change="handleFilterChange"
@@ -192,12 +194,12 @@
           <div class="w-16 bg-gray-200 rounded-full h-2 mr-2">
             <div
               class="h-2 rounded-full"
-              :class="getPerformanceColor(data.performance)"
-              :style="{ width: `${data.performance}%` }"
+              :class="getPerformanceColor(data.performanceRating * 20)"
+              :style="{ width: `${data.performanceRating * 20}%` }"
             ></div>
           </div>
           <span class="text-sm font-medium text-gray-900"
-            >{{ data.performance }}%</span
+            >{{ data.performanceRating }}/5</span
           >
         </div>
       </template>
@@ -317,14 +319,14 @@
               <div class="flex items-center justify-between">
                 <span class="text-sm text-gray-500">Performance</span>
                 <span class="text-sm font-semibold text-gray-900"
-                  >{{ item.performance }}%</span
+                  >{{ item.performanceRating }}/5</span
                 >
               </div>
               <div class="w-full bg-gray-200 rounded-full h-2">
                 <div
                   class="h-2 rounded-full"
-                  :class="getPerformanceColor(item.performance)"
-                  :style="{ width: `${item.performance}%` }"
+                  :class="getPerformanceColor(item.performanceRating * 20)"
+                  :style="{ width: `${item.performanceRating * 20}%` }"
                 ></div>
               </div>
             </div>
@@ -435,6 +437,7 @@ import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useEmployeesStore } from "@/stores/employees";
 import { useCompaniesStore } from "@/stores/companies";
+import { useDepartmentsStore } from "@/stores/departments";
 import {
   BaseTable,
   BaseGridView,
@@ -449,6 +452,7 @@ import Tag from "primevue/tag";
 const router = useRouter();
 const employeesStore = useEmployeesStore();
 const companiesStore = useCompaniesStore();
+const departmentsStore = useDepartmentsStore();
 
 // View state
 const viewMode = ref<"table" | "grid">("table");
@@ -482,23 +486,36 @@ const companyOptions = computed(() => {
   }));
 });
 
-const departmentOptions = computed(() => [
-  { label: "Engineering", value: "Engineering" },
-  { label: "Marketing", value: "Marketing" },
-  { label: "Sales", value: "Sales" },
-  { label: "HR", value: "HR" },
-  { label: "Finance", value: "Finance" },
-  { label: "Operations", value: "Operations" },
-  { label: "Design", value: "Design" },
-  { label: "Product", value: "Product" },
-]);
+const departmentOptions = computed(() => {
+  return departmentsStore.departments.map((dept) => ({
+    label: dept.name,
+    value: dept.name,
+  }));
+});
 
 const statusOptions = computed(() => [
-  { label: "Active", value: "Active" },
-  { label: "Inactive", value: "Inactive" },
-  { label: "On Leave", value: "On Leave" },
-  { label: "Terminated", value: "Terminated" },
+  { label: "Active", value: "active" },
+  { label: "Inactive", value: "inactive" },
+  { label: "On Leave", value: "on leave" },
+  { label: "Terminated", value: "terminated" },
 ]);
+
+// Statistics computed properties
+const activeEmployeesCount = computed(() => {
+  return employeesStore.employees.filter((emp) => emp.status === "active").length;
+});
+
+const averageSalary = computed(() => {
+  if (employeesStore.employees.length === 0) return 0;
+  const total = employeesStore.employees.reduce((sum, emp) => sum + emp.salary, 0);
+  return Math.round(total / employeesStore.employees.length);
+});
+
+const averagePerformance = computed(() => {
+  if (employeesStore.employees.length === 0) return 0;
+  const total = employeesStore.employees.reduce((sum, emp) => sum + emp.performanceRating, 0);
+  return total / employeesStore.employees.length;
+});
 
 const tableColumns = [
   {
@@ -535,6 +552,12 @@ const tableColumns = [
     field: "status",
     header: "Status",
     sortable: true,
+    type: "custom",
+  },
+  {
+    field: "row-actions",
+    header: "Actions",
+    sortable: false,
     type: "custom",
   },
 ];
@@ -634,6 +657,7 @@ onMounted(async () => {
   await Promise.all([
     employeesStore.fetchEmployees(),
     companiesStore.fetchCompanies(),
+    departmentsStore.fetchDepartments(),
   ]);
 });
 </script>

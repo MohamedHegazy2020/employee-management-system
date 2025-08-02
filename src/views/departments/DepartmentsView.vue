@@ -44,8 +44,10 @@
 
           <!-- Company Filter -->
           <BaseDropdown
-            v-model="filters.company"
+            v-model="filters.companyId"
             :options="companyOptions"
+            option-label="label"
+            option-value="value"
             placeholder="Filter by Company"
             :show-clear="true"
             @change="handleFilterChange"
@@ -477,9 +479,9 @@ const companyOptions = computed(() => {
 });
 
 const statusOptions = computed(() => [
-  { label: "Active", value: "Active" },
-  { label: "Inactive", value: "Inactive" },
-  { label: "Under Review", value: "Under Review" },
+  { label: "Active", value: "active" },
+  { label: "Inactive", value: "inactive" },
+  { label: "Under Review", value: "under review" },
 ]);
 
 const tableColumns = [
@@ -511,6 +513,12 @@ const tableColumns = [
     field: "status",
     header: "Status",
     sortable: true,
+    type: "custom",
+  },
+  {
+    field: "row-actions",
+    header: "Actions",
+    sortable: false,
     type: "custom",
   },
 ];
