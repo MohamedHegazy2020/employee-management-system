@@ -111,56 +111,50 @@
             </h3>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <BaseInput
-                v-model="formData.firstName"
-                label="First Name"
-                placeholder="Enter first name"
-                :error="errors.firstName"
-                required
-              />
+                          <BaseInput
+              v-model="formData.firstName"
+              label="First Name"
+              :error="errors.firstName"
+              required
+            />
 
-              <BaseInput
-                v-model="formData.lastName"
-                label="Last Name"
-                placeholder="Enter last name"
-                :error="errors.lastName"
-                required
-              />
+            <BaseInput
+              v-model="formData.lastName"
+              label="Last Name"
+              :error="errors.lastName"
+              required
+            />
 
-              <BaseInput
-                v-model="formData.email"
-                label="Email Address"
-                type="email"
-                placeholder="Enter email address"
-                :error="errors.email"
-                required
-              />
+            <BaseInput
+              v-model="formData.email"
+              label="Email Address"
+              type="email"
+              :error="errors.email"
+              required
+            />
 
-              <BaseInput
-                v-model="formData.phone"
-                label="Phone Number"
-                type="tel"
-                placeholder="Enter phone number"
-                :error="errors.phone"
-                required
-              />
+            <BaseInput
+              v-model="formData.phone"
+              label="Phone Number"
+              type="tel"
+              :error="errors.phone"
+              required
+            />
 
-              <BaseCalendar
-                v-model="formData.dateOfBirth"
-                label="Date of Birth"
-                placeholder="Select date of birth"
-                :error="errors.dateOfBirth"
-                required
-              />
+            <BaseCalendar
+              v-model="formData.dateOfBirth"
+              label="Date of Birth"
+              :error="errors.dateOfBirth"
+              required
+            />
 
-              <BaseDropdown
-                v-model="formData.gender"
-                label="Gender"
-                :options="genderOptions"
-                placeholder="Select gender"
-                :error="errors.gender"
-                required
-              />
+            <BaseDropdown
+              v-model="formData.gender"
+              label="Gender"
+              :options="genderOptions"
+              :error="errors.gender"
+              required
+            />
             </div>
           </div>
 
@@ -174,83 +168,75 @@
             </h3>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <BaseInput
-                v-model="formData.position"
-                label="Position/Title"
-                placeholder="Enter job position"
-                :error="errors.position"
-                required
-              />
+                          <BaseInput
+              v-model="formData.position"
+              label="Position/Title"
+              :error="errors.position"
+              required
+            />
 
-              <BaseDropdown
-                v-model="formData.companyId"
-                label="Company"
-                :options="companyOptions"
-                option-label="name"
-                option-value="id"
-                placeholder="Select company"
-                :error="errors.companyId"
-                :loading="companiesStore.loading"
-                required
-              />
+            <BaseDropdown
+              v-model="formData.companyId"
+              label="Company"
+              :options="companyOptions"
+              option-label="name"
+              option-value="id"
+              :error="errors.companyId"
+              :loading="companiesStore.loading"
+              required
+            />
 
-              <BaseDropdown
-                v-model="formData.departmentId"
-                label="Department"
-                :options="departmentOptions"
-                option-label="name"
-                option-value="id"
-                placeholder="Select department"
-                :error="errors.departmentId"
-                :loading="departmentsStore.loading"
-                required
-              />
+            <BaseDropdown
+              v-model="formData.departmentId"
+              label="Department"
+              :options="departmentOptions"
+              option-label="name"
+              option-value="id"
+              :error="errors.departmentId"
+              :loading="departmentsStore.loading"
+              required
+            />
 
-              <BaseDropdown
-                v-model="formData.managerId"
-                label="Manager"
-                :options="managerOptions"
-                option-label="name"
-                option-value="id"
-                placeholder="Select manager (optional)"
-                :show-clear="true"
-                :error="errors.managerId"
-              />
+            <BaseDropdown
+              v-model="formData.managerId"
+              label="Manager"
+              :options="managerOptions"
+              option-label="name"
+              option-value="id"
+              :show-clear="true"
+              :error="errors.managerId"
+            />
 
-              <BaseInput
-                v-model.number="formData.salary"
-                label="Annual Salary"
-                type="number"
-                placeholder="Enter annual salary"
-                :error="errors.salary"
-                required
-              />
+            <BaseInput
+              v-model.number="formData.salary"
+              label="Annual Salary"
+              type="number"
+              :error="errors.salary"
+              required
+            />
 
-              <BaseDropdown
-                v-model="formData.status"
-                label="Status"
-                :options="statusOptions"
-                placeholder="Select status"
-                :error="errors.status"
-                required
-              />
+            <BaseDropdown
+              v-model="formData.status"
+              label="Status"
+              :options="statusOptions"
+              :error="errors.status"
+              required
+            />
 
-              <BaseCalendar
-                v-model="formData.hireDate"
-                label="Hire Date"
-                placeholder="Select hire date"
-                :error="errors.hireDate"
-                required
-              />
+            <BaseCalendar
+              v-model="formData.hireDate"
+              label="Hire Date"
+              :error="errors.hireDate"
+              required
+            />
 
-              <BaseDropdown
-                v-model="formData.employmentType"
-                label="Employment Type"
-                :options="employmentTypeOptions"
-                placeholder="Select employment type"
-                :error="errors.employmentType"
-                required
-              />
+            <BaseDropdown
+              v-model="formData.employmentType"
+              label="Employment Type"
+              :options="employmentTypeOptions"
+              :error="errors.employmentType"
+              required
+            />
             </div>
           </div>
 

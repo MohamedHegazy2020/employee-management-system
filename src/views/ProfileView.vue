@@ -16,7 +16,13 @@
         <div class="flex items-center space-x-6 mb-6">
           <div class="flex-shrink-0">
             <Avatar
-              v-bind="getAvatarProps(authStore.user?.name || '', undefined, authStore.user?.avatar)"
+              v-bind="
+                getAvatarProps(
+                  authStore.user?.name || '',
+                  undefined,
+                  authStore.user?.avatar
+                )
+              "
               size="xlarge"
               shape="circle"
               class="w-20 h-20 border-4 border-gray-200"
@@ -42,57 +48,47 @@
           @submit="handleUpdateProfile"
         >
           <BaseInput
-            v-model="form.firstName"
+            v-model="profileData.firstName"
             label="First Name"
-            placeholder="Enter first name"
-            icon="pi pi-user"
             :error="errors.firstName"
             required
           />
 
           <BaseInput
-            v-model="form.lastName"
+            v-model="profileData.lastName"
             label="Last Name"
-            placeholder="Enter last name"
-            icon="pi pi-user"
             :error="errors.lastName"
             required
           />
 
           <BaseInput
-            v-model="form.email"
+            v-model="profileData.email"
             label="Email Address"
             type="email"
-            placeholder="Enter email address"
-            icon="pi pi-envelope"
             :error="errors.email"
             required
           />
 
           <BaseInput
-            v-model="form.phone"
+            v-model="profileData.phone"
             label="Phone Number"
             type="tel"
-            placeholder="Enter phone number"
-            icon="pi pi-phone"
             :error="errors.phone"
+            required
           />
 
           <BaseInput
-            v-model="form.jobTitle"
+            v-model="profileData.jobTitle"
             label="Job Title"
-            placeholder="Enter job title"
-            icon="pi pi-briefcase"
             :error="errors.jobTitle"
-            class="md:col-span-2"
+            required
           />
 
           <BaseTextarea
-            v-model="form.bio"
+            v-model="profileData.bio"
             label="Bio"
-            placeholder="Tell us about yourself"
-            :rows="3"
-            class="md:col-span-2"
+            :rows="4"
+            :error="errors.bio"
           />
         </BaseForm>
       </template>
@@ -115,7 +111,6 @@
           <BasePassword
             v-model="passwordForm.currentPassword"
             label="Current Password"
-            placeholder="Enter current password"
             icon="pi pi-lock"
             :error="passwordErrors.currentPassword"
             required
@@ -124,7 +119,6 @@
           <BasePassword
             v-model="passwordForm.newPassword"
             label="New Password"
-            placeholder="Enter new password"
             icon="pi pi-lock"
             :feedback="true"
             :toggle-mask="true"
@@ -135,7 +129,6 @@
           <BasePassword
             v-model="passwordForm.confirmPassword"
             label="Confirm New Password"
-            placeholder="Confirm new password"
             icon="pi pi-lock"
             :feedback="false"
             :toggle-mask="true"
@@ -228,7 +221,7 @@ const successMessage = ref("");
 const passwordSuccessMessage = ref("");
 
 // Profile form
-const form = reactive({
+const profileData = reactive({
   firstName: "",
   lastName: "",
   email: "",
@@ -243,6 +236,7 @@ const errors = reactive({
   email: "",
   phone: "",
   jobTitle: "",
+  bio: "",
 });
 
 // Password form
@@ -274,21 +268,36 @@ const validateProfileForm = () => {
 
   let isValid = true;
 
-  if (!form.firstName.trim()) {
+  if (!profileData.firstName.trim()) {
     errors.firstName = "First name is required";
     isValid = false;
   }
 
-  if (!form.lastName.trim()) {
+  if (!profileData.lastName.trim()) {
     errors.lastName = "Last name is required";
     isValid = false;
   }
 
-  if (!form.email.trim()) {
+  if (!profileData.email.trim()) {
     errors.email = "Email is required";
     isValid = false;
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profileData.email)) {
     errors.email = "Please enter a valid email address";
+    isValid = false;
+  }
+
+  if (!profileData.phone.trim()) {
+    errors.phone = "Phone number is required";
+    isValid = false;
+  }
+
+  if (!profileData.jobTitle.trim()) {
+    errors.jobTitle = "Job title is required";
+    isValid = false;
+  }
+
+  if (!profileData.bio.trim()) {
+    errors.bio = "Bio is required";
     isValid = false;
   }
 
@@ -397,12 +406,13 @@ const handleSavePreferences = async () => {
 onMounted(() => {
   // Load user data into form
   if (authStore.user) {
-    form.firstName = authStore.user.name?.split(" ")[0] || "";
-    form.lastName = authStore.user.name?.split(" ").slice(1).join(" ") || "";
-    form.email = authStore.user.email || "";
-    form.phone = authStore.user.phone || "";
-    form.jobTitle = authStore.user.jobTitle || "";
-    form.bio = authStore.user.bio || "";
+    profileData.firstName = authStore.user.name?.split(" ")[0] || "";
+    profileData.lastName =
+      authStore.user.name?.split(" ").slice(1).join(" ") || "";
+    profileData.email = authStore.user.email || "";
+    profileData.phone = authStore.user.phone || "";
+    profileData.jobTitle = authStore.user.jobTitle || "";
+    profileData.bio = authStore.user.bio || "";
   }
 });
 </script>

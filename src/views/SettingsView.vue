@@ -25,11 +25,11 @@
               <BaseDropdown
                 v-model="settings.theme"
                 :options="themeOptions"
-                placeholder="Select theme"
+                label="Theme"
                 @change="handleThemeChange"
               />
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Color Scheme
@@ -37,7 +37,7 @@
               <BaseDropdown
                 v-model="settings.colorScheme"
                 :options="colorSchemeOptions"
-                placeholder="Select color scheme"
+                label="Color Scheme"
                 @change="handleColorSchemeChange"
               />
             </div>
@@ -49,7 +49,7 @@
               <BaseDropdown
                 v-model="settings.fontSize"
                 :options="fontSizeOptions"
-                placeholder="Select font size"
+                label="Font Size"
                 @change="handleFontSizeChange"
               />
             </div>
@@ -132,7 +132,7 @@
               <BaseDropdown
                 v-model="settings.itemsPerPage"
                 :options="itemsPerPageOptions"
-                placeholder="Select items per page"
+                label="Items Per Page"
                 @change="handleItemsPerPageChange"
               />
             </div>
@@ -384,7 +384,7 @@ const resetSettings = () => {
         twoFactorAuth: false,
         sessionTimeout: true,
       });
-      
+
       toast.add({
         severity: "success",
         summary: "Settings Reset",
@@ -397,14 +397,14 @@ const resetSettings = () => {
 
 const saveSettings = async () => {
   saving.value = true;
-  
+
   try {
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     // Save settings to localStorage or API
     localStorage.setItem("userSettings", JSON.stringify(settings));
-    
+
     toast.add({
       severity: "success",
       summary: "Settings Saved",
@@ -438,4 +438,4 @@ const loadSettings = () => {
 
 // Load settings when component mounts
 loadSettings();
-</script> 
+</script>

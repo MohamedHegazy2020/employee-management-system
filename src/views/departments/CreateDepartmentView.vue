@@ -81,7 +81,6 @@
             <BaseInput
               v-model="formData.name"
               label="Department Name"
-              placeholder="Enter department name"
               :error="errors.name"
               required
             />
@@ -89,7 +88,6 @@
             <BaseInput
               v-model="formData.code"
               label="Department Code"
-              placeholder="Enter department code"
               :error="errors.code"
               required
             />
@@ -100,7 +98,6 @@
               :options="companyOptions"
               option-label="name"
               option-value="id"
-              placeholder="Select company"
               :error="errors.companyId"
               :loading="companiesStore.loading"
               required
@@ -112,7 +109,6 @@
               :options="managerOptions"
               option-label="name"
               option-value="id"
-              placeholder="Select manager (optional)"
               :show-clear="true"
               :error="errors.managerId"
               :loading="employeesStore.loading"
@@ -122,7 +118,6 @@
               v-model="formData.email"
               label="Department Email"
               type="email"
-              placeholder="Enter department email"
               :error="errors.email"
               required
             />
@@ -131,7 +126,6 @@
               v-model="formData.phone"
               label="Department Phone"
               type="tel"
-              placeholder="Enter department phone"
               :error="errors.phone"
               required
             />
@@ -151,7 +145,6 @@
             <BaseInput
               v-model="formData.location"
               label="Location"
-              placeholder="Enter department location"
               :error="errors.location"
               required
             />
@@ -160,7 +153,6 @@
               v-model.number="formData.budget"
               label="Annual Budget"
               type="number"
-              placeholder="Enter annual budget"
               :error="errors.budget"
               required
             />
@@ -168,14 +160,12 @@
             <BaseInput
               v-model="formData.floor"
               label="Floor/Level"
-              placeholder="Enter floor or level"
               :error="errors.floor"
             />
 
             <BaseInput
               v-model="formData.roomNumber"
               label="Room Number"
-              placeholder="Enter room number"
               :error="errors.roomNumber"
             />
           </div>

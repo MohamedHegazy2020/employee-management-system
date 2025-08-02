@@ -81,7 +81,6 @@
             <BaseInput
               v-model="formData.firstName"
               label="First Name"
-              placeholder="Enter first name"
               :error="errors.firstName"
               required
             />
@@ -89,7 +88,6 @@
             <BaseInput
               v-model="formData.lastName"
               label="Last Name"
-              placeholder="Enter last name"
               :error="errors.lastName"
               required
             />
@@ -98,7 +96,6 @@
               v-model="formData.email"
               label="Email Address"
               type="email"
-              placeholder="Enter email address"
               :error="errors.email"
               required
             />
@@ -107,7 +104,6 @@
               v-model="formData.phone"
               label="Phone Number"
               type="tel"
-              placeholder="Enter phone number"
               :error="errors.phone"
               required
             />
@@ -115,7 +111,6 @@
             <BaseCalendar
               v-model="formData.dateOfBirth"
               label="Date of Birth"
-              placeholder="Select date of birth"
               :error="errors.dateOfBirth"
               required
             />
@@ -124,7 +119,6 @@
               v-model="formData.gender"
               label="Gender"
               :options="genderOptions"
-              placeholder="Select gender"
               :error="errors.gender"
               required
             />
@@ -144,7 +138,6 @@
             <BaseInput
               v-model="formData.position"
               label="Position/Title"
-              placeholder="Enter job position"
               :error="errors.position"
               required
             />
@@ -155,7 +148,6 @@
               :options="companyOptions"
               option-label="name"
               option-value="id"
-              placeholder="Select company"
               :error="errors.companyId"
               :loading="companiesStore.loading"
               required
@@ -167,7 +159,6 @@
               :options="departmentOptions"
               option-label="name"
               option-value="id"
-              placeholder="Select department"
               :error="errors.departmentId"
               :loading="departmentsStore.loading"
               required
@@ -179,7 +170,6 @@
               :options="managerOptions"
               option-label="name"
               option-value="id"
-              placeholder="Select manager (optional)"
               :show-clear="true"
               :error="errors.managerId"
             />
@@ -188,7 +178,6 @@
               v-model.number="formData.salary"
               label="Annual Salary"
               type="number"
-              placeholder="Enter annual salary"
               :error="errors.salary"
               required
             />
@@ -197,7 +186,6 @@
               v-model="formData.status"
               label="Status"
               :options="statusOptions"
-              placeholder="Select status"
               :error="errors.status"
               required
             />
@@ -205,7 +193,6 @@
             <BaseCalendar
               v-model="formData.hireDate"
               label="Hire Date"
-              placeholder="Select hire date"
               :error="errors.hireDate"
               required
             />
@@ -214,7 +201,6 @@
               v-model="formData.employmentType"
               label="Employment Type"
               :options="employmentTypeOptions"
-              placeholder="Select employment type"
               :error="errors.employmentType"
               required
             />
@@ -234,7 +220,6 @@
             <BaseInput
               v-model="formData.address.street"
               label="Street Address"
-              placeholder="Enter street address"
               :error="errors.address?.street"
               required
             />
@@ -242,7 +227,6 @@
             <BaseInput
               v-model="formData.address.city"
               label="City"
-              placeholder="Enter city"
               :error="errors.address?.city"
               required
             />
@@ -250,7 +234,6 @@
             <BaseInput
               v-model="formData.address.state"
               label="State/Province"
-              placeholder="Enter state or province"
               :error="errors.address?.state"
               required
             />
@@ -258,7 +241,6 @@
             <BaseInput
               v-model="formData.address.zipCode"
               label="ZIP/Postal Code"
-              placeholder="Enter ZIP or postal code"
               :error="errors.address?.zipCode"
               required
             />
@@ -267,7 +249,6 @@
               v-model="formData.address.country"
               label="Country"
               :options="countryOptions"
-              placeholder="Select country"
               :error="errors.address?.country"
               required
             />
@@ -287,7 +268,6 @@
             <BaseInput
               v-model="formData.emergencyContact.name"
               label="Emergency Contact Name"
-              placeholder="Enter emergency contact name"
               :error="errors.emergencyContact?.name"
               required
             />
@@ -296,7 +276,6 @@
               v-model="formData.emergencyContact.phone"
               label="Emergency Contact Phone"
               type="tel"
-              placeholder="Enter emergency contact phone"
               :error="errors.emergencyContact?.phone"
               required
             />
@@ -304,7 +283,6 @@
             <BaseInput
               v-model="formData.emergencyContact.relationship"
               label="Relationship"
-              placeholder="Enter relationship (e.g., Spouse, Parent)"
               :error="errors.emergencyContact?.relationship"
               required
             />
@@ -338,7 +316,7 @@
               <div class="flex gap-2">
                 <BaseInput
                   v-model="newSkill"
-                  placeholder="Add a skill"
+                  label="Add a skill"
                   class="flex-1"
                   @keyup.enter="addSkill"
                 />
@@ -370,7 +348,7 @@
               <div class="flex gap-2">
                 <BaseInput
                   v-model="newCertification"
-                  placeholder="Add a certification"
+                  label="Add a certification"
                   class="flex-1"
                   @keyup.enter="addCertification"
                 />

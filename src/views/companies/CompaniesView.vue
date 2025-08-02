@@ -56,7 +56,7 @@
           <!-- Search -->
           <BaseInput
             v-model="searchQuery"
-            placeholder="Search companies..."
+            label="Search companies"
             icon="pi pi-search"
             @input="handleSearch"
           />
@@ -65,7 +65,7 @@
           <BaseDropdown
             v-model="filters.industry"
             :options="industryOptions"
-            placeholder="Filter by Industry"
+            label="Filter by Industry"
             :show-clear="true"
             @change="handleFilterChange"
           />
@@ -74,7 +74,7 @@
           <BaseDropdown
             v-model="filters.status"
             :options="statusOptions"
-            placeholder="Filter by Status"
+            label="Filter by Status"
             :show-clear="true"
             @change="handleFilterChange"
           />
@@ -83,7 +83,7 @@
           <BaseDropdown
             v-model="filters.size"
             :options="sizeOptions"
-            placeholder="Filter by Size"
+            label="Filter by Size"
             :show-clear="true"
             @change="handleFilterChange"
           />

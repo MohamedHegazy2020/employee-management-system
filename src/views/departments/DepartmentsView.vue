@@ -37,7 +37,7 @@
           <!-- Search -->
           <BaseInput
             v-model="searchQuery"
-            placeholder="Search departments..."
+            label="Search departments"
             icon="pi pi-search"
             @input="handleSearch"
           />
@@ -46,7 +46,7 @@
           <BaseDropdown
             v-model="filters.companyId"
             :options="companyOptions"
-            placeholder="Filter by Company"
+            label="Filter by Company"
             :show-clear="true"
             @change="handleFilterChange"
           />
@@ -55,7 +55,7 @@
           <BaseDropdown
             v-model="filters.status"
             :options="statusOptions"
-            placeholder="Filter by Status"
+            label="Filter by Status"
             :show-clear="true"
             @change="handleFilterChange"
           />

@@ -35,9 +35,7 @@
                   v-model="form.email"
                   label="Email Address"
                   type="email"
-                  placeholder="Enter your email address"
                   :error="errors.email"
-                  :disabled="authStore.loading"
                   required
                 />
               </div>
@@ -47,11 +45,7 @@
                 <BasePassword
                   v-model="form.password"
                   label="Password"
-                  placeholder="Enter your password"
-                  :feedback="false"
-                  :toggle-mask="true"
                   :error="errors.password"
-                  :disabled="authStore.loading"
                   required
                 />
               </div>

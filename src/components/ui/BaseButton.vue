@@ -71,95 +71,53 @@ const emit = defineEmits<{
 }>();
 
 const buttonClasses = computed(() => {
-  const baseClasses = "font-semibold transition-all duration-300 ease-out border";
-  
-  // Size-based classes (affects text size and overall proportions)
+  const baseClasses =
+    "inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2";
+
   const sizeClasses = {
-    xs: "text-xs",
-    small: "text-sm",
-    medium: "text-base",
-    large: "text-lg",
-    xl: "text-xl",
+    small: "px-3 py-2 text-sm",
+    medium: "px-4 py-2.5 text-sm",
+    large: "px-6 py-3 text-base",
+    xlarge: "px-8 py-4 text-lg",
   };
 
-  // Padding-based classes (affects internal spacing)
   const paddingClasses = {
-    none: "px-1 py-0.5",
-    compact: "px-3 py-1.5",
-    normal: "px-6 py-3",
-    comfortable: "px-8 py-4",
-    spacious: "px-12 py-6",
+    compact: "px-2 py-1.5 text-xs",
+    normal: "px-4 py-2.5 text-sm",
+    relaxed: "px-6 py-3 text-base",
+    loose: "px-8 py-4 text-lg",
   };
-
-  const widthClasses = props.fullWidth ? "w-full" : "";
-  const roundedClasses = props.rounded ? "rounded-full" : "rounded-xl";
 
   const variantClasses = {
-    // Primary - Blue (Default action buttons)
     primary: "btn-primary",
-    
-    // Secondary - Gray (Secondary actions)
     secondary: "btn-secondary",
-    
-    // Success - Green (Positive actions, confirmations)
     success: "btn-success",
-    
-    // Danger - Red (Destructive actions, deletions)
-    danger: "btn-danger",
-    
-    // Warning - Orange (Caution actions, warnings)
     warning: "btn-warning",
-    
-    // Info - Cyan (Information actions, help)
-    info: "btn-info",
-    
-    // Purple (Premium actions, special features)
-    purple: "btn-purple",
-    
-    // Pink (Feminine actions, creative features)
-    pink: "btn-pink",
-    
-    // Indigo (Professional actions, business features)
-    indigo: "btn-indigo",
-    
-    // Teal (Modern actions, tech features)
-    teal: "btn-teal",
-    
-    // Emerald (Nature actions, eco features)
-    emerald: "btn-emerald",
-    
-    // Lime (Fresh actions, new features)
-    lime: "btn-lime",
-    
-    // Amber (Warm actions, friendly features)
-    amber: "btn-amber",
-    
-    // Rose (Romantic actions, love features)
-    rose: "btn-rose",
-    
-    // Slate (Neutral actions, subtle features)
-    slate: "btn-slate",
-    
-    // Zinc (Minimal actions, clean features)
-    zinc: "btn-zinc",
-    
-    // Neutral (Balanced actions, standard features)
-    neutral: "btn-neutral",
-    
-    // Stone (Natural actions, organic features)
-    stone: "btn-stone",
-    
-    // Outline - Bordered style (Alternative actions)
-    outline: "btn-outline",
-    
-    // Ghost - Minimal style (Subtle actions)
-    ghost: "btn-ghost",
-    
-    // Text - Text-only style (Inline actions)
-    text: "btn-text",
+    error: "btn-error",
+    info: "bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md hover:shadow-lg",
+    light:
+      "bg-white text-gray-700 border border-gray-300 shadow-sm hover:shadow-md hover:bg-gray-50",
+    dark: "bg-gradient-to-r from-gray-700 to-gray-800 text-white shadow-md hover:shadow-lg",
+    outline:
+      "bg-transparent border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white",
+    ghost: "bg-transparent text-gray-700 hover:bg-gray-100 hover:text-gray-900",
   };
 
-  return `${baseClasses} ${sizeClasses[props.size]} ${paddingClasses[props.padding]} ${widthClasses} ${roundedClasses} ${variantClasses[props.variant]}`;
+  const stateClasses = {
+    loading: "opacity-75 cursor-not-allowed",
+    disabled: "opacity-50 cursor-not-allowed hover:scale-100",
+  };
+
+  return [
+    baseClasses,
+    sizeClasses[props.size],
+    paddingClasses[props.padding],
+    variantClasses[props.variant],
+    props.loading && stateClasses.loading,
+    props.disabled && stateClasses.disabled,
+  ]
+    .filter(Boolean)
+    .join(" ");
 });
 
 const handleClick = (event: Event) => {
@@ -212,234 +170,270 @@ const handleClick = (event: Event) => {
   background-color: rgb(37 99 235) !important;
   border-color: rgb(37 99 235) !important;
   color: white !important;
-  box-shadow: 0 10px 15px -3px rgb(59 130 246 / 0.25), 0 4px 6px -4px rgb(59 130 246 / 0.25) !important;
+  box-shadow: 0 10px 15px -3px rgb(59 130 246 / 0.25),
+    0 4px 6px -4px rgb(59 130 246 / 0.25) !important;
 }
 
 :deep(.btn-primary:hover) {
   background-color: rgb(29 78 216) !important;
   border-color: rgb(29 78 216) !important;
-  box-shadow: 0 20px 25px -5px rgb(59 130 246 / 0.3), 0 8px 10px -6px rgb(59 130 246 / 0.3) !important;
+  box-shadow: 0 20px 25px -5px rgb(59 130 246 / 0.3),
+    0 8px 10px -6px rgb(59 130 246 / 0.3) !important;
 }
 
 :deep(.btn-secondary) {
   background-color: rgb(75 85 99) !important;
   border-color: rgb(75 85 99) !important;
   color: white !important;
-  box-shadow: 0 10px 15px -3px rgb(75 85 99 / 0.25), 0 4px 6px -4px rgb(75 85 99 / 0.25) !important;
+  box-shadow: 0 10px 15px -3px rgb(75 85 99 / 0.25),
+    0 4px 6px -4px rgb(75 85 99 / 0.25) !important;
 }
 
 :deep(.btn-secondary:hover) {
   background-color: rgb(55 65 81) !important;
   border-color: rgb(55 65 81) !important;
-  box-shadow: 0 20px 25px -5px rgb(75 85 99 / 0.3), 0 8px 10px -6px rgb(75 85 99 / 0.3) !important;
+  box-shadow: 0 20px 25px -5px rgb(75 85 99 / 0.3),
+    0 8px 10px -6px rgb(75 85 99 / 0.3) !important;
 }
 
 :deep(.btn-success) {
   background-color: rgb(34 197 94) !important;
   border-color: rgb(34 197 94) !important;
   color: white !important;
-  box-shadow: 0 10px 15px -3px rgb(34 197 94 / 0.25), 0 4px 6px -4px rgb(34 197 94 / 0.25) !important;
+  box-shadow: 0 10px 15px -3px rgb(34 197 94 / 0.25),
+    0 4px 6px -4px rgb(34 197 94 / 0.25) !important;
 }
 
 :deep(.btn-success:hover) {
   background-color: rgb(22 163 74) !important;
   border-color: rgb(22 163 74) !important;
-  box-shadow: 0 20px 25px -5px rgb(34 197 94 / 0.3), 0 8px 10px -6px rgb(34 197 94 / 0.3) !important;
+  box-shadow: 0 20px 25px -5px rgb(34 197 94 / 0.3),
+    0 8px 10px -6px rgb(34 197 94 / 0.3) !important;
 }
 
 :deep(.btn-danger) {
   background-color: rgb(239 68 68) !important;
   border-color: rgb(239 68 68) !important;
   color: white !important;
-  box-shadow: 0 10px 15px -3px rgb(239 68 68 / 0.25), 0 4px 6px -4px rgb(239 68 68 / 0.25) !important;
+  box-shadow: 0 10px 15px -3px rgb(239 68 68 / 0.25),
+    0 4px 6px -4px rgb(239 68 68 / 0.25) !important;
 }
 
 :deep(.btn-danger:hover) {
   background-color: rgb(220 38 38) !important;
   border-color: rgb(220 38 38) !important;
-  box-shadow: 0 20px 25px -5px rgb(239 68 68 / 0.3), 0 8px 10px -6px rgb(239 68 68 / 0.3) !important;
+  box-shadow: 0 20px 25px -5px rgb(239 68 68 / 0.3),
+    0 8px 10px -6px rgb(239 68 68 / 0.3) !important;
 }
 
 :deep(.btn-warning) {
   background-color: rgb(249 115 22) !important;
   border-color: rgb(249 115 22) !important;
   color: white !important;
-  box-shadow: 0 10px 15px -3px rgb(249 115 22 / 0.25), 0 4px 6px -4px rgb(249 115 22 / 0.25) !important;
+  box-shadow: 0 10px 15px -3px rgb(249 115 22 / 0.25),
+    0 4px 6px -4px rgb(249 115 22 / 0.25) !important;
 }
 
 :deep(.btn-warning:hover) {
   background-color: rgb(234 88 12) !important;
   border-color: rgb(234 88 12) !important;
-  box-shadow: 0 20px 25px -5px rgb(249 115 22 / 0.3), 0 8px 10px -6px rgb(249 115 22 / 0.3) !important;
+  box-shadow: 0 20px 25px -5px rgb(249 115 22 / 0.3),
+    0 8px 10px -6px rgb(249 115 22 / 0.3) !important;
 }
 
 :deep(.btn-info) {
   background-color: rgb(6 182 212) !important;
   border-color: rgb(6 182 212) !important;
   color: white !important;
-  box-shadow: 0 10px 15px -3px rgb(6 182 212 / 0.25), 0 4px 6px -4px rgb(6 182 212 / 0.25) !important;
+  box-shadow: 0 10px 15px -3px rgb(6 182 212 / 0.25),
+    0 4px 6px -4px rgb(6 182 212 / 0.25) !important;
 }
 
 :deep(.btn-info:hover) {
   background-color: rgb(8 145 178) !important;
   border-color: rgb(8 145 178) !important;
-  box-shadow: 0 20px 25px -5px rgb(6 182 212 / 0.3), 0 8px 10px -6px rgb(6 182 212 / 0.3) !important;
+  box-shadow: 0 20px 25px -5px rgb(6 182 212 / 0.3),
+    0 8px 10px -6px rgb(6 182 212 / 0.3) !important;
 }
 
 :deep(.btn-purple) {
   background-color: rgb(147 51 234) !important;
   border-color: rgb(147 51 234) !important;
   color: white !important;
-  box-shadow: 0 10px 15px -3px rgb(147 51 234 / 0.25), 0 4px 6px -4px rgb(147 51 234 / 0.25) !important;
+  box-shadow: 0 10px 15px -3px rgb(147 51 234 / 0.25),
+    0 4px 6px -4px rgb(147 51 234 / 0.25) !important;
 }
 
 :deep(.btn-purple:hover) {
   background-color: rgb(126 34 206) !important;
   border-color: rgb(126 34 206) !important;
-  box-shadow: 0 20px 25px -5px rgb(147 51 234 / 0.3), 0 8px 10px -6px rgb(147 51 234 / 0.3) !important;
+  box-shadow: 0 20px 25px -5px rgb(147 51 234 / 0.3),
+    0 8px 10px -6px rgb(147 51 234 / 0.3) !important;
 }
 
 :deep(.btn-pink) {
   background-color: rgb(236 72 153) !important;
   border-color: rgb(236 72 153) !important;
   color: white !important;
-  box-shadow: 0 10px 15px -3px rgb(236 72 153 / 0.25), 0 4px 6px -4px rgb(236 72 153 / 0.25) !important;
+  box-shadow: 0 10px 15px -3px rgb(236 72 153 / 0.25),
+    0 4px 6px -4px rgb(236 72 153 / 0.25) !important;
 }
 
 :deep(.btn-pink:hover) {
   background-color: rgb(219 39 119) !important;
   border-color: rgb(219 39 119) !important;
-  box-shadow: 0 20px 25px -5px rgb(236 72 153 / 0.3), 0 8px 10px -6px rgb(236 72 153 / 0.3) !important;
+  box-shadow: 0 20px 25px -5px rgb(236 72 153 / 0.3),
+    0 8px 10px -6px rgb(236 72 153 / 0.3) !important;
 }
 
 :deep(.btn-indigo) {
   background-color: rgb(99 102 241) !important;
   border-color: rgb(99 102 241) !important;
   color: white !important;
-  box-shadow: 0 10px 15px -3px rgb(99 102 241 / 0.25), 0 4px 6px -4px rgb(99 102 241 / 0.25) !important;
+  box-shadow: 0 10px 15px -3px rgb(99 102 241 / 0.25),
+    0 4px 6px -4px rgb(99 102 241 / 0.25) !important;
 }
 
 :deep(.btn-indigo:hover) {
   background-color: rgb(79 70 229) !important;
   border-color: rgb(79 70 229) !important;
-  box-shadow: 0 20px 25px -5px rgb(99 102 241 / 0.3), 0 8px 10px -6px rgb(99 102 241 / 0.3) !important;
+  box-shadow: 0 20px 25px -5px rgb(99 102 241 / 0.3),
+    0 8px 10px -6px rgb(99 102 241 / 0.3) !important;
 }
 
 :deep(.btn-teal) {
   background-color: rgb(20 184 166) !important;
   border-color: rgb(20 184 166) !important;
   color: white !important;
-  box-shadow: 0 10px 15px -3px rgb(20 184 166 / 0.25), 0 4px 6px -4px rgb(20 184 166 / 0.25) !important;
+  box-shadow: 0 10px 15px -3px rgb(20 184 166 / 0.25),
+    0 4px 6px -4px rgb(20 184 166 / 0.25) !important;
 }
 
 :deep(.btn-teal:hover) {
   background-color: rgb(13 148 136) !important;
   border-color: rgb(13 148 136) !important;
-  box-shadow: 0 20px 25px -5px rgb(20 184 166 / 0.3), 0 8px 10px -6px rgb(20 184 166 / 0.3) !important;
+  box-shadow: 0 20px 25px -5px rgb(20 184 166 / 0.3),
+    0 8px 10px -6px rgb(20 184 166 / 0.3) !important;
 }
 
 :deep(.btn-emerald) {
   background-color: rgb(16 185 129) !important;
   border-color: rgb(16 185 129) !important;
   color: white !important;
-  box-shadow: 0 10px 15px -3px rgb(16 185 129 / 0.25), 0 4px 6px -4px rgb(16 185 129 / 0.25) !important;
+  box-shadow: 0 10px 15px -3px rgb(16 185 129 / 0.25),
+    0 4px 6px -4px rgb(16 185 129 / 0.25) !important;
 }
 
 :deep(.btn-emerald:hover) {
   background-color: rgb(5 150 105) !important;
   border-color: rgb(5 150 105) !important;
-  box-shadow: 0 20px 25px -5px rgb(16 185 129 / 0.3), 0 8px 10px -6px rgb(16 185 129 / 0.3) !important;
+  box-shadow: 0 20px 25px -5px rgb(16 185 129 / 0.3),
+    0 8px 10px -6px rgb(16 185 129 / 0.3) !important;
 }
 
 :deep(.btn-lime) {
   background-color: rgb(132 204 22) !important;
   border-color: rgb(132 204 22) !important;
   color: white !important;
-  box-shadow: 0 10px 15px -3px rgb(132 204 22 / 0.25), 0 4px 6px -4px rgb(132 204 22 / 0.25) !important;
+  box-shadow: 0 10px 15px -3px rgb(132 204 22 / 0.25),
+    0 4px 6px -4px rgb(132 204 22 / 0.25) !important;
 }
 
 :deep(.btn-lime:hover) {
   background-color: rgb(101 163 13) !important;
   border-color: rgb(101 163 13) !important;
-  box-shadow: 0 20px 25px -5px rgb(132 204 22 / 0.3), 0 8px 10px -6px rgb(132 204 22 / 0.3) !important;
+  box-shadow: 0 20px 25px -5px rgb(132 204 22 / 0.3),
+    0 8px 10px -6px rgb(132 204 22 / 0.3) !important;
 }
 
 :deep(.btn-amber) {
   background-color: rgb(245 158 11) !important;
   border-color: rgb(245 158 11) !important;
   color: white !important;
-  box-shadow: 0 10px 15px -3px rgb(245 158 11 / 0.25), 0 4px 6px -4px rgb(245 158 11 / 0.25) !important;
+  box-shadow: 0 10px 15px -3px rgb(245 158 11 / 0.25),
+    0 4px 6px -4px rgb(245 158 11 / 0.25) !important;
 }
 
 :deep(.btn-amber:hover) {
   background-color: rgb(217 119 6) !important;
   border-color: rgb(217 119 6) !important;
-  box-shadow: 0 20px 25px -5px rgb(245 158 11 / 0.3), 0 8px 10px -6px rgb(245 158 11 / 0.3) !important;
+  box-shadow: 0 20px 25px -5px rgb(245 158 11 / 0.3),
+    0 8px 10px -6px rgb(245 158 11 / 0.3) !important;
 }
 
 :deep(.btn-rose) {
   background-color: rgb(244 63 94) !important;
   border-color: rgb(244 63 94) !important;
   color: white !important;
-  box-shadow: 0 10px 15px -3px rgb(244 63 94 / 0.25), 0 4px 6px -4px rgb(244 63 94 / 0.25) !important;
+  box-shadow: 0 10px 15px -3px rgb(244 63 94 / 0.25),
+    0 4px 6px -4px rgb(244 63 94 / 0.25) !important;
 }
 
 :deep(.btn-rose:hover) {
   background-color: rgb(225 29 72) !important;
   border-color: rgb(225 29 72) !important;
-  box-shadow: 0 20px 25px -5px rgb(244 63 94 / 0.3), 0 8px 10px -6px rgb(244 63 94 / 0.3) !important;
+  box-shadow: 0 20px 25px -5px rgb(244 63 94 / 0.3),
+    0 8px 10px -6px rgb(244 63 94 / 0.3) !important;
 }
 
 :deep(.btn-slate) {
   background-color: rgb(100 116 139) !important;
   border-color: rgb(100 116 139) !important;
   color: white !important;
-  box-shadow: 0 10px 15px -3px rgb(100 116 139 / 0.25), 0 4px 6px -4px rgb(100 116 139 / 0.25) !important;
+  box-shadow: 0 10px 15px -3px rgb(100 116 139 / 0.25),
+    0 4px 6px -4px rgb(100 116 139 / 0.25) !important;
 }
 
 :deep(.btn-slate:hover) {
   background-color: rgb(71 85 105) !important;
   border-color: rgb(71 85 105) !important;
-  box-shadow: 0 20px 25px -5px rgb(100 116 139 / 0.3), 0 8px 10px -6px rgb(100 116 139 / 0.3) !important;
+  box-shadow: 0 20px 25px -5px rgb(100 116 139 / 0.3),
+    0 8px 10px -6px rgb(100 116 139 / 0.3) !important;
 }
 
 :deep(.btn-zinc) {
   background-color: rgb(113 113 122) !important;
   border-color: rgb(113 113 122) !important;
   color: white !important;
-  box-shadow: 0 10px 15px -3px rgb(113 113 122 / 0.25), 0 4px 6px -4px rgb(113 113 122 / 0.25) !important;
+  box-shadow: 0 10px 15px -3px rgb(113 113 122 / 0.25),
+    0 4px 6px -4px rgb(113 113 122 / 0.25) !important;
 }
 
 :deep(.btn-zinc:hover) {
   background-color: rgb(82 82 91) !important;
   border-color: rgb(82 82 91) !important;
-  box-shadow: 0 20px 25px -5px rgb(113 113 122 / 0.3), 0 8px 10px -6px rgb(113 113 122 / 0.3) !important;
+  box-shadow: 0 20px 25px -5px rgb(113 113 122 / 0.3),
+    0 8px 10px -6px rgb(113 113 122 / 0.3) !important;
 }
 
 :deep(.btn-neutral) {
   background-color: rgb(115 115 115) !important;
   border-color: rgb(115 115 115) !important;
   color: white !important;
-  box-shadow: 0 10px 15px -3px rgb(115 115 115 / 0.25), 0 4px 6px -4px rgb(115 115 115 / 0.25) !important;
+  box-shadow: 0 10px 15px -3px rgb(115 115 115 / 0.25),
+    0 4px 6px -4px rgb(115 115 115 / 0.25) !important;
 }
 
 :deep(.btn-neutral:hover) {
   background-color: rgb(82 82 82) !important;
   border-color: rgb(82 82 82) !important;
-  box-shadow: 0 20px 25px -5px rgb(115 115 115 / 0.3), 0 8px 10px -6px rgb(115 115 115 / 0.3) !important;
+  box-shadow: 0 20px 25px -5px rgb(115 115 115 / 0.3),
+    0 8px 10px -6px rgb(115 115 115 / 0.3) !important;
 }
 
 :deep(.btn-stone) {
   background-color: rgb(120 113 108) !important;
   border-color: rgb(120 113 108) !important;
   color: white !important;
-  box-shadow: 0 10px 15px -3px rgb(120 113 108 / 0.25), 0 4px 6px -4px rgb(120 113 108 / 0.25) !important;
+  box-shadow: 0 10px 15px -3px rgb(120 113 108 / 0.25),
+    0 4px 6px -4px rgb(120 113 108 / 0.25) !important;
 }
 
 :deep(.btn-stone:hover) {
   background-color: rgb(87 83 78) !important;
   border-color: rgb(87 83 78) !important;
-  box-shadow: 0 20px 25px -5px rgb(120 113 108 / 0.3), 0 8px 10px -6px rgb(120 113 108 / 0.3) !important;
+  box-shadow: 0 20px 25px -5px rgb(120 113 108 / 0.3),
+    0 8px 10px -6px rgb(120 113 108 / 0.3) !important;
 }
 
 :deep(.btn-outline) {
@@ -557,53 +551,53 @@ const handleClick = (event: Event) => {
   :deep(.p-button) {
     font-size: 0.875rem;
   }
-  
+
   /* Adjust padding for mobile */
   :deep(.p-button.px-1) {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
   }
-  
+
   :deep(.p-button.px-3) {
     padding-left: 0.75rem;
     padding-right: 0.75rem;
   }
-  
+
   :deep(.p-button.px-6) {
     padding-left: 1rem;
     padding-right: 1rem;
   }
-  
+
   :deep(.p-button.px-8) {
     padding-left: 1.25rem;
     padding-right: 1.25rem;
   }
-  
+
   :deep(.p-button.px-12) {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
   }
-  
+
   :deep(.p-button.py-0\\.5) {
     padding-top: 0.25rem;
     padding-bottom: 0.25rem;
   }
-  
+
   :deep(.p-button.py-1\\.5) {
     padding-top: 0.375rem;
     padding-bottom: 0.375rem;
   }
-  
+
   :deep(.p-button.py-3) {
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
   }
-  
+
   :deep(.p-button.py-4) {
     padding-top: 0.75rem;
     padding-bottom: 0.75rem;
   }
-  
+
   :deep(.p-button.py-6) {
     padding-top: 1rem;
     padding-bottom: 1rem;
